@@ -74,7 +74,7 @@ const EventCard = ({ event, onSwipe, isTop, swipeDirection }: EventCardProps) =>
         {/* Tags on image */}
         <div className="absolute bottom-3 left-4 flex gap-1.5">
           {event.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="rounded-full bg-white/80 backdrop-blur-sm px-3 py-1 text-[11px] font-medium text-foreground">
+            <span key={tag} className="rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-[11px] font-medium" style={{ color: "hsl(220, 15%, 10%)" }}>
               {tag}
             </span>
           ))}
