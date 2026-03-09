@@ -89,15 +89,7 @@ const Signup = () => {
     otp: "Enter the code we sent",
   };
 
-  const InputField = ({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) => (
-    <div className="space-y-2">
-      <label className="text-[13px] font-medium text-foreground/70">{label}</label>
-      <Input
-        {...props}
-        className="h-13 rounded-xl border-border/50 bg-secondary/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-foreground/30 focus-visible:border-foreground/20"
-      />
-    </div>
-  );
+  /* InputField is intentionally inlined below to avoid component identity issues */
 
   const BackButton = ({ onClick, text = "Back" }: { onClick: () => void; text?: string }) => (
     <button onClick={onClick} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
