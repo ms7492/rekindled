@@ -45,35 +45,21 @@ const Signup = () => {
       toast.error("Please enter a valid phone number");
       return;
     }
-    setLoading(true);
-    const formattedPhone = phone.startsWith("+") ? phone : `+1${phone}`;
-    const { error } = await supabase.auth.signInWithOtp({ phone: formattedPhone });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      setStep("otp");
-      toast.success("OTP sent!");
-    }
+    // Mock: skip real OTP, go straight to code step
+    setStep("otp");
+    toast.success("OTP sent! (mock: use 123456)");
   };
 
   const handleVerifyOtp = async () => {
-    setLoading(true);
-    const formattedPhone = phone.startsWith("+") ? phone : `+1${phone}`;
-    const { error } = await supabase.auth.verifyOtp({
-      phone: formattedPhone,
-      token: otp,
-      type: "sms",
-    });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      // TODO: save name, email, avatar to profile in DB
-      localStorage.setItem("rekindle_name", name);
-      localStorage.setItem("rekindle_email", email);
-      navigate("/interests");
+    // Mock: accept any 6-digit code
+    if (otp.length < 6) {
+      toast.error("Enter a 6-digit code");
+      return;
     }
+    localStorage.setItem("rekindle_name", name);
+    localStorage.setItem("rekindle_email", email);
+    toast.success("Welcome to Rekindle!");
+    navigate("/interests");
   };
 
   return (
