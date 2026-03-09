@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, useScroll, useTransform, useInView, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Plus } from "lucide-react";
 import CustomCursor from "@/components/CustomCursor";
@@ -23,27 +23,25 @@ const SplitHeading = ({
   className?: string;
   as?: "h1" | "h2" | "h3";
 }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
   const words = children.split(" ");
 
   return (
-    <Tag ref={ref} className={className}>
+    <Tag className={className}>
       {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
-          <motion.span
-            className="inline-block"
-            initial={{ y: "110%", opacity: 0 }}
-            animate={isInView ? { y: "0%", opacity: 1 } : {}}
-            transition={{
-              duration: 0.7,
-              ease: [0.22, 1, 0.36, 1],
-              delay: i * 0.06,
-            }}
-          >
-            {word}
-          </motion.span>
-        </span>
+        <motion.span
+          key={i}
+          className="inline-block mr-[0.3em]"
+          initial={{ y: 30, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{
+            duration: 0.6,
+            ease: [0.22, 1, 0.36, 1],
+            delay: i * 0.04,
+          }}
+        >
+          {word}
+        </motion.span>
       ))}
     </Tag>
   );
@@ -62,27 +60,23 @@ const ScaleRevealImage = ({
   alt: string;
   className?: string;
   delay?: number;
-}) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-
-  return (
-    <div ref={ref} className="overflow-hidden rounded-3xl">
-      <motion.img
-        src={src}
-        alt={alt}
-        className={className}
-        initial={{ scale: 1.15, opacity: 0 }}
-        animate={isInView ? { scale: 1, opacity: 1 } : {}}
-        transition={{
-          duration: 1.4,
-          ease: [0.22, 1, 0.36, 1],
-          delay,
-        }}
-      />
-    </div>
-  );
-};
+}) => (
+  <div className="overflow-hidden rounded-3xl">
+    <motion.img
+      src={src}
+      alt={alt}
+      className={className}
+      initial={{ scale: 1.08, opacity: 0 }}
+      whileInView={{ scale: 1, opacity: 1 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{
+        duration: 1.2,
+        ease: [0.22, 1, 0.36, 1],
+        delay,
+      }}
+    />
+  </div>
+);
 
 /* ─────────────────────────────────────────────
    Micro-interaction: Fade section wrapper
@@ -95,28 +89,24 @@ const FadeSection = ({
   children: React.ReactNode;
   className?: string;
   delay?: number;
-}) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-};
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.2 }}
+    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay }}
+    className={className}
+  >
+    {children}
+  </motion.div>
+);
 
 /* ─────────────────────────────────────────────
    Micro-interaction: Handdrawn arrow SVG
    ───────────────────────────────────────────── */
 const HanddrawnArrow = ({ className = "" }: { className?: string }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-40px" });
+  const isInView = useInView(ref, { once: true });
 
   return (
     <motion.svg
@@ -250,7 +240,6 @@ const TestimonialCarousel = () => {
 
   return (
     <div>
-      {/* Progress bars */}
       <div className="flex gap-2 mb-10">
         {TESTIMONIALS.map((_, i) => (
           <button
@@ -265,8 +254,6 @@ const TestimonialCarousel = () => {
           </button>
         ))}
       </div>
-
-      {/* Quote */}
       <AnimatePresence mode="wait">
         <motion.blockquote
           key={active}
@@ -353,7 +340,6 @@ const Landing = () => {
   const navigate = useNavigate();
   const go = () => navigate("/signup");
 
-  /* ── Parallax for hero image ── */
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -362,7 +348,6 @@ const Landing = () => {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 180]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
-  /* ── Frosted nav on scroll ── */
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 100);
@@ -374,8 +359,8 @@ const Landing = () => {
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <CustomCursor />
 
-      {/* ── Sticky Nav with frosted glass + dot hover indicators ── */}
-      <motion.nav
+      {/* ── Sticky Nav ── */}
+      <nav
         className={`fixed top-0 z-50 w-full transition-all duration-500 ${
           scrolled
             ? "bg-background/70 backdrop-blur-2xl border-b border-border/40 shadow-card"
@@ -415,15 +400,14 @@ const Landing = () => {
             </motion.div>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* ═══════════════════════════════════════════
-          HERO — Desktop layout with parallax image
+          HERO
          ═══════════════════════════════════════════ */}
       <section ref={heroRef} className="pt-20 lg:pt-0">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid min-h-screen items-center gap-12 lg:grid-cols-12 lg:gap-8">
-            {/* Text column */}
             <div className="col-span-full space-y-7 pt-24 lg:col-span-5 lg:pt-0">
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -434,7 +418,6 @@ const Landing = () => {
                 Our Approach
               </motion.p>
 
-              {/* Hero headline — staggered line by line */}
               <div className="space-y-1">
                 {["Find your next", "friend group."].map((line, i) => (
                   <div key={i} className="overflow-hidden">
@@ -487,12 +470,10 @@ const Landing = () => {
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </motion.div>
-                {/* Handdrawn arrow pointing to CTA */}
                 <HanddrawnArrow className="w-24 h-12 -right-28 top-1/2 -translate-y-1/2 hidden lg:block" />
               </motion.div>
             </div>
 
-            {/* Hero image with parallax */}
             <motion.div
               className="col-span-full lg:col-span-7"
               style={{ y: heroY }}
@@ -516,7 +497,7 @@ const Landing = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          PROBLEM STATEMENT — Large serif
+          PROBLEM STATEMENT
          ═══════════════════════════════════════════ */}
       <section className="px-6 py-32 lg:px-10 lg:py-48">
         <div className="mx-auto max-w-7xl">
@@ -530,7 +511,7 @@ const Landing = () => {
               <SplitHeading className="text-display-lg font-display font-bold leading-snug">
                 You've tried meetups where nobody talked to you. Apps that led nowhere. Events where nobody made space for you.
               </SplitHeading>
-              <FadeSection delay={0.5}>
+              <FadeSection delay={0.4}>
                 <p className="mt-8 max-w-xl text-lg text-muted-foreground leading-relaxed">
                   The problem isn't effort. It's format. Rekindle fixes the format.
                 </p>
@@ -541,62 +522,46 @@ const Landing = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          HOW IT WORKS — 3 asymmetric grid sections
+          HOW IT WORKS
          ═══════════════════════════════════════════ */}
       <div id="how">
-        {/* Step 1: Before */}
         <section className="px-6 lg:px-10">
           <div className="mx-auto max-w-7xl">
             <div className="grid min-h-[80vh] items-center gap-10 lg:grid-cols-12 lg:gap-16">
               <div className="lg:col-span-5 xl:col-span-4 xl:col-start-2">
                 <FadeSection>
-                  <span className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">
-                    1
-                  </span>
+                  <span className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">1</span>
                 </FadeSection>
                 <SplitHeading className="mb-5 text-display-md font-display font-bold">
                   Don't walk in blind.
                 </SplitHeading>
-                <FadeSection delay={0.3}>
+                <FadeSection delay={0.2}>
                   <p className="text-base text-muted-foreground leading-relaxed lg:text-lg">
                     You see the activity, the vibe, the group size, who's hosting. You decide if it's for you — before you show up.
                   </p>
                 </FadeSection>
               </div>
               <div className="lg:col-span-7">
-                <ScaleRevealImage
-                  src={adventureImg}
-                  alt="Friends at golden hour"
-                  className="aspect-[4/3] w-full object-cover"
-                  delay={0.15}
-                />
+                <ScaleRevealImage src={adventureImg} alt="Friends at golden hour" className="aspect-[4/3] w-full object-cover" delay={0.1} />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Step 2: During — reversed */}
         <section className="px-6 py-20 lg:px-10 lg:py-0">
           <div className="mx-auto max-w-7xl">
             <div className="grid min-h-[80vh] items-center gap-10 lg:grid-cols-12 lg:gap-16">
               <div className="order-2 lg:order-1 lg:col-span-7">
-                <ScaleRevealImage
-                  src={gamesImg}
-                  alt="Friends enjoying together"
-                  className="aspect-[4/3] w-full object-cover"
-                  delay={0.15}
-                />
+                <ScaleRevealImage src={gamesImg} alt="Friends enjoying together" className="aspect-[4/3] w-full object-cover" delay={0.1} />
               </div>
               <div className="order-1 lg:order-2 lg:col-span-5 xl:col-span-4">
                 <FadeSection>
-                  <span className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">
-                    2
-                  </span>
+                  <span className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">2</span>
                 </FadeSection>
                 <SplitHeading className="mb-5 text-display-md font-display font-bold">
                   The activity carries you.
                 </SplitHeading>
-                <FadeSection delay={0.3}>
+                <FadeSection delay={0.2}>
                   <p className="text-base text-muted-foreground leading-relaxed lg:text-lg">
                     The host makes sure nobody's standing alone. The small group means you actually get to know people — not just their names.
                   </p>
@@ -606,39 +571,27 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Step 3: After — centered with flanking images */}
         <section className="px-6 py-20 lg:px-10 lg:py-40">
           <div className="mx-auto max-w-7xl">
             <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-8">
               <div className="hidden lg:col-span-3 lg:block">
-                <ScaleRevealImage
-                  src={coffeeImg}
-                  alt="Coffee shop moment"
-                  className="aspect-[3/4] w-full object-cover"
-                />
+                <ScaleRevealImage src={coffeeImg} alt="Coffee shop moment" className="aspect-[3/4] w-full object-cover" />
               </div>
               <div className="text-center lg:col-span-6">
                 <FadeSection>
-                  <span className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">
-                    3
-                  </span>
+                  <span className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">3</span>
                 </FadeSection>
                 <SplitHeading className="mb-5 text-display-md font-display font-bold">
                   One hang plants the seed.
                 </SplitHeading>
-                <FadeSection delay={0.3}>
+                <FadeSection delay={0.2}>
                   <p className="mx-auto max-w-md text-base text-muted-foreground leading-relaxed lg:text-lg">
                     Group chat opens. Follow-up hangs happen if the group clicks. Your future matches improve based on feedback.
                   </p>
                 </FadeSection>
               </div>
               <div className="hidden lg:col-span-3 lg:block">
-                <ScaleRevealImage
-                  src={coupleImg}
-                  alt="Friends at carnival"
-                  className="aspect-[3/4] w-full object-cover"
-                  delay={0.2}
-                />
+                <ScaleRevealImage src={coupleImg} alt="Friends at carnival" className="aspect-[3/4] w-full object-cover" delay={0.15} />
               </div>
             </div>
           </div>
@@ -646,16 +599,12 @@ const Landing = () => {
       </div>
 
       {/* ═══════════════════════════════════════════
-          TESTIMONIALS — Full-bleed with auto-advance carousel
+          TESTIMONIALS
          ═══════════════════════════════════════════ */}
       <section id="testimonials" className="bg-foreground text-primary-foreground">
         <div className="grid lg:grid-cols-2">
           <div className="overflow-hidden">
-            <ScaleRevealImage
-              src={cafeImg}
-              alt="Friends at outdoor cafe"
-              className="h-full min-h-[50vh] w-full object-cover lg:min-h-[100vh]"
-            />
+            <ScaleRevealImage src={cafeImg} alt="Friends at outdoor cafe" className="h-full min-h-[50vh] w-full object-cover lg:min-h-[100vh]" />
           </div>
           <div className="flex flex-col justify-center px-8 py-20 lg:px-16 xl:px-24">
             <FadeSection>
@@ -671,16 +620,14 @@ const Landing = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          PRICING — Cards with lift hover
+          PRICING
          ═══════════════════════════════════════════ */}
       <section id="pricing" className="px-6 py-32 lg:px-10 lg:py-44">
         <div className="mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-12">
             <div className="lg:col-span-4 xl:col-span-3 xl:col-start-2">
               <FadeSection>
-                <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-brand">
-                  Pricing
-                </p>
+                <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-brand">Pricing</p>
               </FadeSection>
               <SplitHeading className="text-display-md font-display font-bold">
                 Simple, honest pricing.
@@ -697,14 +644,10 @@ const Landing = () => {
                     <LiftCard
                       key={plan.label}
                       className={`rounded-2xl border p-6 shadow-card transition-shadow ${
-                        plan.featured
-                          ? "border-brand bg-brand/5"
-                          : "border-border"
+                        plan.featured ? "border-brand bg-brand/5" : "border-border"
                       }`}
                     >
-                      <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                        {plan.label}
-                      </p>
+                      <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{plan.label}</p>
                       <p className="mb-1 font-display text-3xl font-bold">{plan.price}</p>
                       <p className="text-sm text-muted-foreground">{plan.detail}</p>
                     </LiftCard>
@@ -717,14 +660,12 @@ const Landing = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          FAQ — Spring accordion
+          FAQ
          ═══════════════════════════════════════════ */}
       <section id="faq" className="px-6 py-20 lg:px-10 lg:py-32">
         <div className="mx-auto max-w-3xl">
           <FadeSection>
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-brand">
-              FAQ
-            </p>
+            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-brand">FAQ</p>
           </FadeSection>
           <SplitHeading className="mb-12 text-display-md font-display font-bold">
             Questions we get a lot.
@@ -742,10 +683,15 @@ const Landing = () => {
          ═══════════════════════════════════════════ */}
       <section className="bg-foreground px-6 py-32 lg:px-10 lg:py-44">
         <div className="mx-auto max-w-3xl text-center">
-          <FadeSection>
-            <SplitHeading as="h2" className="mb-10 font-display text-display-lg font-bold text-white">
-              Stop waiting for someone to invite you.
-            </SplitHeading>
+          <SplitHeading as="h2" className="mb-10 font-display text-display-lg font-bold text-white">
+            Stop waiting for someone to invite you.
+          </SplitHeading>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+          >
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
@@ -761,7 +707,7 @@ const Landing = () => {
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </motion.div>
-          </FadeSection>
+          </motion.div>
         </div>
       </section>
 
