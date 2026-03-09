@@ -16,7 +16,7 @@ const Landing = () => {
   const go = () => navigate("/signup");
 
   return (
-    <div className="min-h-screen bg-foreground text-primary-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-[hsl(220,20%,8%)] text-white overflow-x-hidden">
       <LandingNav onAction={go} />
       <HeroSection onAction={go} />
       <StorySection />
