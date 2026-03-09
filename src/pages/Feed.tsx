@@ -9,11 +9,14 @@ import { toast } from "sonner";
 const Feed = () => {
   const [events, setEvents] = useState(MOCK_EVENTS);
   const [swipedRight, setSwipedRight] = useState<string[]>([]);
+  const [swipeDirection, setSwipeDirection] = useState<"left" | "right">("left");
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
       const current = events[0];
       if (!current) return;
+
+      setSwipeDirection(direction);
 
       if (direction === "right") {
         setSwipedRight((prev) => [...prev, current.id]);
