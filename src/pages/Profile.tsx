@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calendar, Flame } from "lucide-react";
+import { LogOut, Calendar, Flame, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ const MOCK_PROFILE = {
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -31,10 +33,15 @@ const Profile = () => {
       <div className="px-6 pb-4 pt-12">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Profile</h1>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="mr-1 h-4 w-4" />
-            Sign out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="mr-1 h-4 w-4" />
+              Sign out
+            </Button>
+          </div>
         </div>
       </div>
 

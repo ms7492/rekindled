@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import BottomNav from "@/components/BottomNav";
@@ -9,21 +9,27 @@ import { toast } from "sonner";
 const Feed = () => {
   const [events, setEvents] = useState(MOCK_EVENTS);
   const [swipedRight, setSwipedRight] = useState<string[]>([]);
-  const [swipeDirection, setSwipeDirection] = useState<"left" | "right">("left");
+  const swipeDirectionRef = useRef<"left" | "right">("right");
+  const [, forceUpdate] = useState(0);
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
       const current = events[0];
       if (!current) return;
 
-      setSwipeDirection(direction);
+      swipeDirectionRef.current = direction;
 
       if (direction === "right") {
         setSwipedRight((prev) => [...prev, current.id]);
         toast.success(`You're in for "${current.title}" 🔥`);
       }
 
-      setEvents((prev) => prev.slice(1));
+      // Force a re-render so the exit animation picks up the ref value,
+      // then remove the card on the next tick
+      forceUpdate((n) => n + 1);
+      requestAnimationFrame(() => {
+        setEvents((prev) => prev.slice(1));
+      });
     },
     [events]
   );
@@ -59,7 +65,7 @@ const Feed = () => {
                     event={event}
                     onSwipe={handleSwipe}
                     isTop={i === events.slice(0, 2).reverse().length - 1}
-                    swipeDirection={swipeDirection}
+                    swipeDirection={swipeDirectionRef.current}
                   />
                 ))
             ) : (
