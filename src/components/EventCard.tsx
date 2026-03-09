@@ -20,6 +20,7 @@ interface EventCardProps {
 }
 
 const EventCard = ({ event, onSwipe, isTop }: EventCardProps) => {
+  const [exitX, setExitX] = useState(0);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-15, 0, 15]);
   const likeOpacity = useTransform(x, [0, 100], [0, 1]);
@@ -27,8 +28,10 @@ const EventCard = ({ event, onSwipe, isTop }: EventCardProps) => {
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.x > 120) {
+      setExitX(500);
       onSwipe("right");
     } else if (info.offset.x < -120) {
+      setExitX(-500);
       onSwipe("left");
     }
   };
@@ -53,7 +56,7 @@ const EventCard = ({ event, onSwipe, isTop }: EventCardProps) => {
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
       whileTap={{ scale: 1.02 }}
-      exit={{ x: 500, opacity: 0, transition: { duration: 0.3 } }}
+      exit={{ x: exitX, opacity: 0, transition: { duration: 0.3 } }}
     >
       {/* Image */}
       <img src={event.image} alt={event.title} className="h-3/5 w-full object-cover" />
