@@ -65,7 +65,7 @@ const Feed = () => {
                     event={event}
                     onSwipe={handleSwipe}
                     isTop={i === events.slice(0, 2).reverse().length - 1}
-                    swipeDirection={swipeDirection}
+                    swipeDirection={swipeDirectionRef.current}
                   />
                 ))
             ) : (
