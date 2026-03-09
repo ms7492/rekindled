@@ -15,6 +15,8 @@ const fade = {
   exit: { opacity: 0, x: -20, transition: { duration: 0.2 } },
 };
 
+const inputCls = "h-13 rounded-xl border-border/50 bg-secondary/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-foreground/30 focus-visible:border-foreground/20";
+
 const Signup = () => {
   const [step, setStep] = useState<Step>("method");
   const [name, setName] = useState("");
@@ -89,17 +91,24 @@ const Signup = () => {
     otp: "Enter the code we sent",
   };
 
-  /* InputField is intentionally inlined below to avoid component identity issues */
-
-  const BackButton = ({ onClick, text = "Back" }: { onClick: () => void; text?: string }) => (
-    <button onClick={onClick} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-      <ArrowLeft className="h-3.5 w-3.5" /> {text}
-    </button>
+  const avatarPicker = (
+    <div className="flex justify-center">
+      <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border/50 bg-card/50 transition-all hover:border-foreground/20 hover:shadow-card">
+        {avatarPreview ? (
+          <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex flex-col items-center gap-1">
+            <Camera className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <span className="text-[10px] text-muted-foreground">Photo</span>
+          </div>
+        )}
+        <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+      </label>
+    </div>
   );
 
   return (
     <div className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6">
-      {/* Subtle background glow */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[400px] w-[400px] rounded-full bg-accent/[0.03] blur-[100px]" />
       </div>
@@ -110,12 +119,10 @@ const Signup = () => {
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
         className="relative flex w-full max-w-[400px] flex-col items-center"
       >
-        {/* Logo */}
         <h1 className="mb-2 font-display text-4xl font-bold tracking-tight">Rekindle</h1>
         <p className="mb-12 text-center text-sm text-muted-foreground">{subtitle[step]}</p>
 
         <AnimatePresence mode="wait">
-          {/* Method chooser */}
           {step === "method" && (
             <motion.div key="method" {...fade} className="w-full space-y-3">
               <button
@@ -151,29 +158,25 @@ const Signup = () => {
             </motion.div>
           )}
 
-          {/* Email form */}
           {step === "email-input" && (
             <motion.div key="email" {...fade} className="w-full space-y-5">
               {!isLogin && (
                 <>
-                  <div className="flex justify-center">
-                    <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border/50 bg-card/50 transition-all hover:border-foreground/20 hover:shadow-card">
-                      {avatarPreview ? (
-                        <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex flex-col items-center gap-1">
-                          <Camera className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                          <span className="text-[10px] text-muted-foreground">Photo</span>
-                        </div>
-                      )}
-                      <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
-                    </label>
+                  {avatarPicker}
+                  <div className="space-y-2">
+                    <label className="text-[13px] font-medium text-foreground/70">Name</label>
+                    <Input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
                   </div>
-                  <InputField label="Name" type="text" placeholder="Your name" value={name} onChange={(e) => setName((e.target as HTMLInputElement).value)} />
                 </>
               )}
-              <InputField label="Email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail((e.target as HTMLInputElement).value)} />
-              <InputField label="Password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword((e.target as HTMLInputElement).value)} />
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-foreground/70">Email</label>
+                <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-foreground/70">Password</label>
+                <Input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
+              </div>
               <Button
                 className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90"
                 onClick={handleEmailSubmit}
@@ -188,47 +191,47 @@ const Signup = () => {
                   {isLogin ? "Sign up" : "Sign in"}
                 </button>
               </p>
-              <BackButton onClick={() => { setStep("method"); setIsLogin(false); }} />
+              <button onClick={() => { setStep("method"); setIsLogin(false); }} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-3.5 w-3.5" /> Back
+              </button>
             </motion.div>
           )}
 
-          {/* Phone flow: info */}
           {step === "info" && (
             <motion.div key="info" {...fade} className="w-full space-y-5">
-              <div className="flex justify-center">
-                <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border/50 bg-card/50 transition-all hover:border-foreground/20 hover:shadow-card">
-                  {avatarPreview ? (
-                    <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex flex-col items-center gap-1">
-                      <Camera className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                      <span className="text-[10px] text-muted-foreground">Photo</span>
-                    </div>
-                  )}
-                  <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
-                </label>
+              {avatarPicker}
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-foreground/70">Name</label>
+                <Input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
               </div>
-              <InputField label="Name" type="text" placeholder="Your name" value={name} onChange={(e) => setName((e.target as HTMLInputElement).value)} />
-              <InputField label="Email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail((e.target as HTMLInputElement).value)} />
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-foreground/70">Email</label>
+                <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
+              </div>
               <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleInfoContinue}>
                 Continue <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
-              <BackButton onClick={() => setStep("method")} />
+              <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-3.5 w-3.5" /> Back
+              </button>
             </motion.div>
           )}
 
-          {/* Phone input */}
           {step === "phone-input" && (
             <motion.div key="phone" {...fade} className="w-full space-y-5">
-              <InputField label="Phone Number" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone((e.target as HTMLInputElement).value)} />
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-foreground/70">Phone Number</label>
+                <Input type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} />
+              </div>
               <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleSendOtp}>
                 Send Code <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
-              <BackButton onClick={() => setStep("info")} />
+              <button onClick={() => setStep("info")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-3.5 w-3.5" /> Back
+              </button>
             </motion.div>
           )}
 
-          {/* OTP */}
           {step === "otp" && (
             <motion.div key="otp" {...fade} className="w-full space-y-5">
               <div className="space-y-2">
@@ -241,7 +244,9 @@ const Signup = () => {
               <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleVerifyOtp}>
                 Verify & Enter <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
-              <BackButton onClick={() => setStep("phone-input")} text="Change number" />
+              <button onClick={() => setStep("phone-input")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-3.5 w-3.5" /> Change number
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
