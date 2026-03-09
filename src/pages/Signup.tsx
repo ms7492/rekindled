@@ -11,7 +11,7 @@ type Step = "method" | "info" | "phone-input" | "otp" | "email-input";
 
 const fade = {
   initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
   exit: { opacity: 0, x: -20, transition: { duration: 0.2 } },
 };
 
