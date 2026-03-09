@@ -16,9 +16,10 @@ interface EventCardProps {
   event: EventData;
   onSwipe: (direction: "left" | "right") => void;
   isTop: boolean;
+  swipeDirection: "left" | "right";
 }
 
-const EventCard = ({ event, onSwipe, isTop }: EventCardProps) => {
+const EventCard = ({ event, onSwipe, isTop, swipeDirection }: EventCardProps) => {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-15, 0, 15]);
   const likeOpacity = useTransform(x, [0, 100], [0, 1]);
@@ -52,7 +53,7 @@ const EventCard = ({ event, onSwipe, isTop }: EventCardProps) => {
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
       whileTap={{ scale: 1.02 }}
-      exit={{ x: 500, opacity: 0, transition: { duration: 0.3 } }}
+      exit={{ x: swipeDirection === "right" ? 500 : -500, opacity: 0, transition: { duration: 0.3 } }}
     >
       {/* Image */}
       <img src={event.image} alt={event.title} className="h-3/5 w-full object-cover" />

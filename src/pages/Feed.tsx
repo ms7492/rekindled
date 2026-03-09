@@ -9,11 +9,14 @@ import { toast } from "sonner";
 const Feed = () => {
   const [events, setEvents] = useState(MOCK_EVENTS);
   const [swipedRight, setSwipedRight] = useState<string[]>([]);
+  const [swipeDirection, setSwipeDirection] = useState<"left" | "right">("left");
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
       const current = events[0];
       if (!current) return;
+
+      setSwipeDirection(direction);
 
       if (direction === "right") {
         setSwipedRight((prev) => [...prev, current.id]);
@@ -56,6 +59,7 @@ const Feed = () => {
                     event={event}
                     onSwipe={handleSwipe}
                     isTop={i === events.slice(0, 2).reverse().length - 1}
+                    swipeDirection={swipeDirection}
                   />
                 ))
             ) : (
