@@ -43,8 +43,8 @@ const Feed = () => {
       </div>
 
       {/* Card stack */}
-      <div className="relative mx-auto flex w-full max-w-sm flex-1 items-center justify-center px-6 pb-32">
-        <div className="relative h-[480px] w-full">
+      <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center px-6 pb-20">
+        <div className="relative h-[420px] w-full">
           <AnimatePresence>
             {events.length > 0 ? (
               events
@@ -78,12 +78,12 @@ const Feed = () => {
 
         {/* Action buttons */}
         {events.length > 0 && (
-          <div className="absolute bottom-24 z-20 flex items-center gap-6">
+          <div className="mt-6 flex items-center gap-6">
             <button
               onClick={() => handleButtonSwipe("left")}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-card shadow-card transition-transform hover:scale-110 active:scale-95"
+              className="flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card shadow-card transition-transform hover:scale-110 active:scale-95"
             >
-              <X className="h-6 w-6 text-muted-foreground" />
+              <X className="h-7 w-7 text-muted-foreground" />
             </button>
             <button
               onClick={() => handleButtonSwipe("right")}
