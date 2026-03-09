@@ -17,11 +17,6 @@ export default {
         display: ["Playfair Display", "Georgia", "serif"],
         body: ["DM Sans", "system-ui", "sans-serif"],
       },
-      fontSize: {
-        "display-xl": ["clamp(3rem, 6vw, 5rem)", { lineHeight: "1.05", letterSpacing: "-0.02em" }],
-        "display-lg": ["clamp(2.25rem, 4vw, 3.5rem)", { lineHeight: "1.1", letterSpacing: "-0.01em" }],
-        "display-md": ["clamp(1.75rem, 3vw, 2.5rem)", { lineHeight: "1.15" }],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,10 +42,6 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
-        },
-        brand: {
-          DEFAULT: "hsl(var(--brand))",
-          foreground: "hsl(var(--brand-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -85,15 +76,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "draw": {
-          from: { strokeDashoffset: "100" },
-          to: { strokeDashoffset: "0" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "draw": "draw 1.2s ease-out forwards",
       },
     },
   },
