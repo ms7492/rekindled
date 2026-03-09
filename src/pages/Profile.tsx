@@ -20,6 +20,7 @@ const MOCK_PROFILE = {
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
