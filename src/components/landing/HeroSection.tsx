@@ -40,7 +40,7 @@ const HeroSection = ({ onAction }: { onAction: () => void }) => (
             variants={fade}
             className="mb-6 text-sm font-semibold uppercase tracking-[0.2em] text-white/50"
           >
-            Designed to be deleted
+            Where real friendships begin
           </motion.p>
           <motion.h1
             custom={1}
