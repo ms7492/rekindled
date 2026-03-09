@@ -8,57 +8,59 @@ const Rooms = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <div className="px-6 pb-4 pt-12">
-        <h1 className="font-display text-2xl font-bold">Your Chats</h1>
-        <p className="text-sm text-muted-foreground">
-          Chat with your matched groups
+    <div className="flex min-h-[100svh] flex-col bg-background">
+      <div className="px-6 pb-2 pt-14">
+        <h1 className="font-display text-2xl font-bold">Chats</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          Your matched group conversations
         </p>
       </div>
 
-      <div className="flex-1 space-y-2 px-6 pb-24">
+      <div className="flex-1 px-6 pb-24">
         {MOCK_ROOMS.length > 0 ? (
-          MOCK_ROOMS.map((room, i) => (
-            <motion.button
-              key={room.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              onClick={() => navigate(`/chat/${room.id}`)}
-              className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 shadow-card transition-colors hover:bg-secondary text-left"
-            >
-              <div className="relative flex h-12 w-12 flex-shrink-0">
-                {room.members.slice(0, 3).map((m, j) => (
-                  <img
-                    key={m.id}
-                    src={m.avatar}
-                    alt={m.name}
-                    className="absolute h-8 w-8 rounded-full border-2 border-card bg-secondary"
-                    style={{ left: j * 10, zIndex: 3 - j }}
-                  />
-                ))}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground truncate">{room.eventTitle}</h3>
-                  <span className="text-xs text-muted-foreground flex-shrink-0">{room.lastMessageTime}</span>
+          <div className="divide-y divide-border">
+            {MOCK_ROOMS.map((room, i) => (
+              <motion.button
+                key={room.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                onClick={() => navigate(`/chat/${room.id}`)}
+                className="flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-secondary/50 -mx-3 px-3 rounded-xl"
+              >
+                {/* Stacked avatars */}
+                <div className="relative flex h-12 w-12 flex-shrink-0">
+                  {room.members.slice(0, 3).map((m, j) => (
+                    <img
+                      key={m.id}
+                      src={m.avatar}
+                      alt={m.name}
+                      className="absolute h-7 w-7 rounded-full border-2 border-background bg-secondary"
+                      style={{ left: j * 10, top: j * 2, zIndex: 3 - j }}
+                    />
+                  ))}
                 </div>
-                <p className="text-sm text-muted-foreground truncate">{room.lastMessage}</p>
-                <span className="text-xs text-muted-foreground">{room.eventDate} · {room.members.length} people</span>
-              </div>
 
-              {room.unread > 0 && (
-                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
-                  {room.unread}
-                </span>
-              )}
-            </motion.button>
-          ))
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <h3 className="font-semibold text-foreground text-[15px] truncate">{room.eventTitle}</h3>
+                    <span className="text-[11px] text-muted-foreground flex-shrink-0 ml-2">{room.lastMessageTime}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground truncate">{room.lastMessage}</p>
+                </div>
+
+                {room.unread > 0 && (
+                  <span className="flex h-5 min-w-[20px] flex-shrink-0 items-center justify-center rounded-full bg-accent px-1.5 text-[10px] font-bold text-accent-foreground">
+                    {room.unread}
+                  </span>
+                )}
+              </motion.button>
+            ))}
+          </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
-              <MessageCircle className="h-7 w-7 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-secondary">
+              <MessageCircle className="h-8 w-8 text-muted-foreground" />
             </div>
             <h2 className="mb-2 font-display text-xl font-bold">No chats yet</h2>
             <p className="text-sm text-muted-foreground">
