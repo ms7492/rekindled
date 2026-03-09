@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calendar, Flame } from "lucide-react";
+import { LogOut, Calendar, Flame, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
