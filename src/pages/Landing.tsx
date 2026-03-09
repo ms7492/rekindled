@@ -2,18 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Flame, Users, Coffee, Dumbbell, Music, MapPin, ChevronDown, Star, ArrowRight } from "lucide-react";
+import { Users, ChevronDown, ArrowRight } from "lucide-react";
 
 const STEPS = [
   {
     label: "Before",
     title: "Don't walk in blind.",
-    desc: "You see everything: the activity, the vibe, the group size, who's hosting. You decide if it's for you. No blind commitment.",
+    desc: "You see everything: the activity, the vibe, the group size, who's hosting. You decide if it's for you.",
   },
   {
     label: "During",
     title: "The activity carries you.",
-    desc: "The activity carries the first 15 minutes. The host makes sure nobody's standing alone. The small group means you actually get to know people.",
+    desc: "The host makes sure nobody's standing alone. The small group means you actually get to know people.",
   },
   {
     label: "After",
@@ -50,12 +50,12 @@ const FAQS = [
 ];
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const } },
 };
 
 const stagger = {
-  visible: { transition: { staggerChildren: 0.12 } },
+  visible: { transition: { staggerChildren: 0.1 } },
 };
 
 const Landing = () => {
@@ -67,32 +67,27 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
-          <a href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-            <Flame className="h-5 w-5 text-primary" />
+          <a href="/" className="font-display text-2xl font-bold tracking-tight">
             Rekindle
           </a>
           <Button variant="hero" size="sm" onClick={goSignup}>
-            Try free
+            Get started
           </Button>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="relative overflow-hidden px-6 pb-16 pt-20 text-center">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/8 blur-[120px]" />
-        </div>
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="relative mx-auto max-w-2xl">
-          <motion.h1 variants={fadeUp} className="mb-5 text-4xl font-bold leading-tight md:text-5xl">
-            Your next friend group starts with{" "}
-            <span className="text-gradient">one hang.</span>
+      <section className="px-6 pb-20 pt-24 text-center">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-2xl">
+          <motion.h1 variants={fadeUp} className="mb-6 text-4xl font-bold leading-[1.15] md:text-[56px]">
+            Your next friend group starts with one hang.
           </motion.h1>
-          <motion.p variants={fadeUp} className="mx-auto mb-8 max-w-lg text-lg text-muted-foreground">
-            Small groups. Shared activities. A host who makes sure nobody stands alone. This is how you rebuild your social life — one hang at a time.
+          <motion.p variants={fadeUp} className="mx-auto mb-10 max-w-lg text-lg text-muted-foreground leading-relaxed">
+            Small groups. Shared activities. A host who makes sure nobody stands alone.
           </motion.p>
-          <motion.div variants={fadeUp} className="mb-4 flex flex-wrap justify-center gap-4">
+          <motion.div variants={fadeUp} className="mb-5 flex flex-wrap justify-center gap-4">
             <Button variant="hero" size="lg" onClick={goSignup}>
               Try your first hang free
               <ArrowRight className="ml-1 h-4 w-4" />
@@ -101,66 +96,68 @@ const Landing = () => {
               See how it works
             </Button>
           </motion.div>
-          <motion.p variants={fadeUp} className="text-sm text-muted-foreground">
+          <motion.p variants={fadeUp} className="text-sm text-muted-foreground italic">
             Everyone comes alone. That's the whole point.
           </motion.p>
         </motion.div>
       </section>
 
       {/* Problem */}
-      <section className="border-y border-border bg-card px-6 py-16">
+      <section className="border-y border-border bg-secondary/50 px-6 py-20">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-xl text-center">
-          <motion.h2 variants={fadeUp} className="mb-6 text-3xl font-bold">
+          <motion.h2 variants={fadeUp} className="mb-6 text-3xl font-bold md:text-4xl">
             You've tried. It hasn't worked.
           </motion.h2>
-          <motion.p variants={fadeUp} className="mb-4 text-muted-foreground">
+          <motion.p variants={fadeUp} className="mb-4 text-muted-foreground leading-relaxed">
             You've gone to meetups where nobody talked to you. Downloaded apps that led nowhere. Said yes to events and left early because nobody made space for you.
           </motion.p>
-          <motion.p variants={fadeUp} className="mb-6 text-muted-foreground">
-            The problem isn't effort. It's format. Big groups, no structure, no follow-up, no reason to talk to anyone specific.
+          <motion.p variants={fadeUp} className="mb-8 text-muted-foreground leading-relaxed">
+            The problem isn't effort. It's format.
           </motion.p>
-          <motion.p variants={fadeUp} className="text-xl font-semibold text-gradient">
+          <motion.p variants={fadeUp} className="font-display text-2xl font-semibold">
             Rekindle fixes the format.
           </motion.p>
         </motion.div>
       </section>
 
       {/* How it works */}
-      <section id="how" className="px-6 py-16">
+      <section id="how" className="px-6 py-20">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-5xl">
-          <motion.h2 variants={fadeUp} className="mb-3 text-center text-3xl font-bold">How it works</motion.h2>
-          <motion.p variants={fadeUp} className="mx-auto mb-12 max-w-xl text-center text-muted-foreground">
-            6–8 people matched by interest, age, and vibe. A shared activity that does the social heavy lifting. A trained host who keeps things flowing.
+          <motion.h2 variants={fadeUp} className="mb-4 text-center text-3xl font-bold md:text-4xl">How it works</motion.h2>
+          <motion.p variants={fadeUp} className="mx-auto mb-14 max-w-xl text-center text-muted-foreground leading-relaxed">
+            6–8 people matched by interest, age, and vibe. A shared activity. A trained host.
           </motion.p>
-          <motion.div variants={stagger} className="grid gap-6 md:grid-columns-3 md:grid-cols-3">
-            {STEPS.map((step) => (
-              <motion.div key={step.label} variants={fadeUp} className="rounded-2xl border border-border bg-card p-7 shadow-card">
-                <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-primary">{step.label}</span>
-                <h3 className="mb-3 text-lg font-semibold">{step.title}</h3>
-                <p className="text-sm text-muted-foreground">{step.desc}</p>
+          <motion.div variants={stagger} className="grid gap-6 md:grid-cols-3">
+            {STEPS.map((step, i) => (
+              <motion.div key={step.label} variants={fadeUp} className="rounded-2xl border border-border bg-card p-8 shadow-card">
+                <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  {i + 1}
+                </span>
+                <h3 className="mb-3 font-display text-xl font-semibold">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
           </motion.div>
-          <motion.p variants={fadeUp} className="mt-10 text-center text-lg font-semibold">
-            This isn't an event you attend. It's a group you <span className="text-gradient">join.</span>
+          <motion.p variants={fadeUp} className="mt-12 text-center font-display text-xl font-semibold">
+            This isn't an event you attend. It's a group you join.
           </motion.p>
         </motion.div>
       </section>
 
       {/* Hang examples */}
-      <section className="border-y border-border bg-card px-6 py-16">
+      <section className="border-y border-border bg-secondary/50 px-6 py-20">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-5xl">
-          <motion.h2 variants={fadeUp} className="mb-10 text-center text-3xl font-bold">What a hang looks like</motion.h2>
+          <motion.h2 variants={fadeUp} className="mb-12 text-center text-3xl font-bold md:text-4xl">What a hang looks like</motion.h2>
           <motion.div variants={stagger} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {HANGS.map((hang) => (
-              <motion.div key={hang.activity} variants={fadeUp} className="rounded-xl border border-border bg-background p-5 shadow-card">
-                <p className="mb-3 font-semibold text-foreground">{hang.activity}</p>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <motion.div key={hang.activity} variants={fadeUp} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+                <p className="mb-3 font-medium text-foreground">{hang.activity}</p>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5 text-primary" />
+                    <Users className="h-3.5 w-3.5" />
                     {hang.people} people
                   </span>
-                  <span>{hang.vibe}</span>
+                  <span className="rounded-full bg-secondary px-2 py-0.5">{hang.vibe}</span>
                 </div>
               </motion.div>
             ))}
@@ -169,13 +166,13 @@ const Landing = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="px-6 py-16">
+      <section className="px-6 py-20">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-5xl">
-          <motion.h2 variants={fadeUp} className="mb-10 text-center text-3xl font-bold">After one hang</motion.h2>
+          <motion.h2 variants={fadeUp} className="mb-12 text-center text-3xl font-bold md:text-4xl">After one hang</motion.h2>
           <motion.div variants={stagger} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((t) => (
-              <motion.div key={t.author} variants={fadeUp} className="rounded-xl border border-border bg-card p-6 shadow-card">
-                <p className="mb-3 italic text-foreground">"{t.text}"</p>
+              <motion.div key={t.author} variants={fadeUp} className="rounded-2xl border border-border bg-card p-7 shadow-card">
+                <p className="mb-4 font-display text-lg italic leading-relaxed text-foreground">"{t.text}"</p>
                 <p className="text-sm font-medium text-muted-foreground">— {t.author}</p>
               </motion.div>
             ))}
@@ -184,10 +181,10 @@ const Landing = () => {
       </section>
 
       {/* Pricing */}
-      <section className="border-y border-border bg-card px-6 py-16 text-center">
+      <section className="border-y border-border bg-secondary/50 px-6 py-20 text-center">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-3xl">
-          <motion.h2 variants={fadeUp} className="mb-10 text-3xl font-bold">Pricing</motion.h2>
-          <motion.div variants={stagger} className="mb-6 flex flex-col items-center justify-center gap-5 sm:flex-row">
+          <motion.h2 variants={fadeUp} className="mb-12 text-3xl font-bold md:text-4xl">Pricing</motion.h2>
+          <motion.div variants={stagger} className="mb-8 flex flex-col items-center justify-center gap-5 sm:flex-row">
             {[
               { label: "First hang", price: "Free", detail: "No card required" },
               { label: "Per hang", price: "$10", detail: "Pay as you go", featured: true },
@@ -196,15 +193,15 @@ const Landing = () => {
               <motion.div
                 key={plan.label}
                 variants={fadeUp}
-                className={`flex-1 rounded-xl border bg-background p-7 shadow-card ${plan.featured ? "border-primary shadow-glow" : "border-border"}`}
+                className={`flex-1 rounded-2xl border bg-card p-8 shadow-card ${plan.featured ? "border-foreground ring-1 ring-foreground" : "border-border"}`}
               >
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{plan.label}</p>
-                <p className="mb-1 text-3xl font-bold text-foreground">{plan.price}</p>
+                <p className="mb-1 font-display text-4xl font-bold text-foreground">{plan.price}</p>
                 <p className="text-sm text-muted-foreground">{plan.detail}</p>
               </motion.div>
             ))}
           </motion.div>
-          <p className="mb-6 text-sm text-muted-foreground">Sliding scale coming soon.</p>
+          <p className="mb-8 text-sm text-muted-foreground italic">Sliding scale coming soon.</p>
           <Button variant="hero" size="lg" onClick={goSignup}>
             Try your first hang free
           </Button>
@@ -212,21 +209,21 @@ const Landing = () => {
       </section>
 
       {/* FAQ */}
-      <section className="px-6 py-16">
+      <section className="px-6 py-20">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-2xl">
-          <motion.h2 variants={fadeUp} className="mb-10 text-center text-3xl font-bold">FAQ</motion.h2>
-          <div className="space-y-0">
+          <motion.h2 variants={fadeUp} className="mb-12 text-center text-3xl font-bold md:text-4xl">FAQ</motion.h2>
+          <div>
             {FAQS.map((faq, i) => (
               <motion.div key={i} variants={fadeUp} className="border-b border-border">
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="flex w-full items-center justify-between py-5 text-left text-base font-semibold text-foreground transition-colors hover:text-primary"
+                  className="flex w-full items-center justify-between py-6 text-left text-base font-semibold text-foreground transition-colors hover:text-muted-foreground"
                 >
                   {faq.q}
                   <ChevronDown className={`h-5 w-5 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`} />
                 </button>
-                <div className={`overflow-hidden transition-all duration-200 ${openFaq === i ? "max-h-40 pb-5" : "max-h-0"}`}>
-                  <p className="text-sm text-muted-foreground">{faq.a}</p>
+                <div className={`overflow-hidden transition-all duration-200 ${openFaq === i ? "max-h-40 pb-6" : "max-h-0"}`}>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
                 </div>
               </motion.div>
             ))}
@@ -235,9 +232,9 @@ const Landing = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="px-6 py-20 text-center">
+      <section className="px-6 py-24 text-center">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mx-auto max-w-lg">
-          <motion.h2 variants={fadeUp} className="mb-8 text-3xl font-bold">
+          <motion.h2 variants={fadeUp} className="mb-8 text-3xl font-bold md:text-4xl">
             Stop waiting for someone to invite you.
           </motion.h2>
           <motion.div variants={fadeUp}>
@@ -250,7 +247,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border px-6 py-8 text-center">
+      <footer className="border-t border-border px-6 py-10 text-center">
         <p className="text-sm text-muted-foreground">© 2026 Rekindle. Making showing up feel easier.</p>
       </footer>
     </div>

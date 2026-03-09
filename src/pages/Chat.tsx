@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Send, Flame, Users } from "lucide-react";
+import { ArrowLeft, Send, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { MOCK_ROOMS, MOCK_CHAT, ChatMessage } from "@/data/mockRooms";
 
@@ -32,10 +32,10 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex h-screen flex-col gradient-surface">
+    <div className="flex h-screen flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-border bg-card/80 px-4 pb-3 pt-12 backdrop-blur-xl">
-        <button onClick={() => navigate("/rooms")} className="text-foreground">
+      <div className="flex items-center gap-3 border-b border-border bg-card px-4 pb-3 pt-12">
+        <button onClick={() => navigate("/rooms")} className="text-foreground hover:text-muted-foreground transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
@@ -56,35 +56,29 @@ const Chat = () => {
           return (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: i * 0.04 }}
               className={`flex gap-2 ${isMe ? "flex-row-reverse" : "flex-row"}`}
             >
               {!isMe && (
                 <div className="flex-shrink-0">
-                  {isAI ? (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full gradient-primary">
-                      <Flame className="h-4 w-4 text-primary-foreground" />
-                    </div>
-                  ) : (
-                    <img src={msg.senderAvatar} alt={msg.senderName} className="h-8 w-8 rounded-full bg-secondary" />
-                  )}
+                  <img src={msg.senderAvatar} alt={msg.senderName} className="h-8 w-8 rounded-full bg-secondary" />
                 </div>
               )}
               <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"}`}>
                 {!isMe && (
-                  <span className={`text-xs font-medium mb-0.5 block ${isAI ? "text-primary" : "text-muted-foreground"}`}>
+                  <span className={`text-xs font-medium mb-0.5 block ${isAI ? "text-accent" : "text-muted-foreground"}`}>
                     {msg.senderName}
                   </span>
                 )}
                 <div
                   className={`rounded-2xl px-4 py-2.5 text-sm ${
                     isMe
-                      ? "gradient-primary text-primary-foreground rounded-br-md"
+                      ? "bg-primary text-primary-foreground rounded-br-md"
                       : isAI
-                      ? "bg-primary/10 text-foreground border border-primary/20 rounded-bl-md"
-                      : "bg-card text-foreground rounded-bl-md"
+                      ? "bg-accent/10 text-foreground border border-accent/20 rounded-bl-md"
+                      : "bg-secondary text-foreground rounded-bl-md"
                   }`}
                 >
                   {msg.content}
@@ -97,18 +91,18 @@ const Chat = () => {
       </div>
 
       {/* Input */}
-      <div className="border-t border-border bg-card/80 px-4 py-3 backdrop-blur-xl">
+      <div className="border-t border-border bg-card px-4 py-3">
         <div className="flex items-center gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 rounded-xl border-border bg-secondary text-foreground placeholder:text-muted-foreground"
+            className="flex-1 rounded-full border-border bg-secondary text-foreground placeholder:text-muted-foreground h-11"
           />
           <button
             onClick={handleSend}
-            className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary text-primary-foreground transition-transform active:scale-95"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform active:scale-95"
           >
             <Send className="h-4 w-4" />
           </button>
