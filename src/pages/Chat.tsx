@@ -31,8 +31,8 @@ const Chat = () => {
   return (
     <div className="flex h-[100svh] flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-border bg-card px-4 pb-3.5 pt-14">
-        <button onClick={() => navigate("/rooms")} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors">
+      <div className="flex items-center gap-3 border-b border-border bg-card/80 backdrop-blur-xl px-4 pb-4 pt-14">
+        <button onClick={() => navigate("/rooms")} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-secondary transition-colors">
           <ArrowLeft className="h-5 w-5 text-foreground" />
         </button>
         <div className="flex-1 min-w-0">
@@ -45,7 +45,7 @@ const Chat = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-5">
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
         {messages.map((msg, i) => {
           const isMe = msg.senderId === "me";
           const isAI = msg.isAI;
@@ -53,10 +53,10 @@ const Chat = () => {
           return (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03, duration: 0.3 }}
-              className={`flex gap-2.5 ${isMe ? "flex-row-reverse" : "flex-row"}`}
+              className={`flex gap-3 ${isMe ? "flex-row-reverse" : "flex-row"}`}
             >
               {!isMe && (
                 <div className="flex-shrink-0 pt-5">
@@ -78,15 +78,15 @@ const Chat = () => {
                 <div
                   className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                     isMe
-                      ? "bg-foreground text-primary-foreground rounded-br-lg"
+                      ? "bg-foreground text-primary-foreground rounded-br-md"
                       : isAI
-                      ? "bg-accent/8 text-foreground border border-accent/15 rounded-bl-lg"
-                      : "bg-card border border-border text-foreground rounded-bl-lg"
+                      ? "bg-accent/8 text-foreground border border-accent/15 rounded-bl-md"
+                      : "bg-card border border-border text-foreground rounded-bl-md"
                   }`}
                 >
                   {msg.content}
                 </div>
-                <span className="mt-1 block text-[10px] text-muted-foreground">{msg.timestamp}</span>
+                <span className="mt-1.5 block text-[10px] text-muted-foreground">{msg.timestamp}</span>
               </div>
             </motion.div>
           );
@@ -94,19 +94,19 @@ const Chat = () => {
       </div>
 
       {/* Input */}
-      <div className="border-t border-border bg-card px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        <div className="flex items-center gap-2.5">
+      <div className="border-t border-border bg-card/80 backdrop-blur-xl px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center gap-3">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 rounded-full border-border bg-secondary text-foreground placeholder:text-muted-foreground h-11 px-4"
+            className="flex-1 rounded-full border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground h-12 px-5"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim()}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground text-primary-foreground transition-all hover:opacity-90 active:scale-95 disabled:opacity-30"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-foreground text-primary-foreground transition-all hover:opacity-90 active:scale-95 disabled:opacity-30"
           >
             <Send className="h-4 w-4" />
           </button>
