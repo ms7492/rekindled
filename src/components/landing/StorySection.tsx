@@ -6,12 +6,12 @@ import cheersImg from "@/assets/section-cheers.jpg";
 
 const fade = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const imgReveal = {
   hidden: { opacity: 0, scale: 1.05 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 1.4, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, scale: 1, transition: { duration: 1.4, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const StorySection = () => (
