@@ -8,26 +8,25 @@ const Rooms = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex min-h-screen flex-col gradient-surface">
+    <div className="flex min-h-screen flex-col bg-background">
       <div className="px-6 pb-4 pt-12">
-        <h1 className="text-2xl font-bold">Your Rooms</h1>
+        <h1 className="font-display text-2xl font-bold">Your Chats</h1>
         <p className="text-sm text-muted-foreground">
           Chat with your matched groups
         </p>
       </div>
 
-      <div className="flex-1 space-y-3 px-6 pb-24">
+      <div className="flex-1 space-y-2 px-6 pb-24">
         {MOCK_ROOMS.length > 0 ? (
           MOCK_ROOMS.map((room, i) => (
             <motion.button
               key={room.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.08 }}
               onClick={() => navigate(`/chat/${room.id}`)}
-              className="flex w-full items-center gap-4 rounded-2xl bg-card p-4 shadow-card transition-colors hover:bg-secondary text-left"
+              className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 shadow-card transition-colors hover:bg-secondary text-left"
             >
-              {/* Stacked avatars */}
               <div className="relative flex h-12 w-12 flex-shrink-0">
                 {room.members.slice(0, 3).map((m, j) => (
                   <img
@@ -50,7 +49,7 @@ const Rooms = () => {
               </div>
 
               {room.unread > 0 && (
-                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full gradient-primary text-[10px] font-bold text-primary-foreground">
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
                   {room.unread}
                 </span>
               )}
@@ -58,12 +57,12 @@ const Rooms = () => {
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary">
-              <MessageCircle className="h-8 w-8 text-muted-foreground" />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+              <MessageCircle className="h-7 w-7 text-muted-foreground" />
             </div>
-            <h2 className="mb-2 text-xl font-bold">No rooms yet</h2>
+            <h2 className="mb-2 font-display text-xl font-bold">No chats yet</h2>
             <p className="text-sm text-muted-foreground">
-              Swipe right on events to get matched into rooms!
+              Like events to get matched into groups!
             </p>
           </div>
         )}

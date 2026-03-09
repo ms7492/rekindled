@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Flame, ArrowRight, ArrowLeft, Camera, User } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { ArrowRight, ArrowLeft, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 type Step = "info" | "phone" | "otp";
@@ -16,7 +15,6 @@ const Signup = () => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,13 +43,11 @@ const Signup = () => {
       toast.error("Please enter a valid phone number");
       return;
     }
-    // Mock: skip real OTP, go straight to code step
     setStep("otp");
     toast.success("OTP sent! (mock: use 123456)");
   };
 
   const handleVerifyOtp = async () => {
-    // Mock: accept any 6-digit code
     if (otp.length < 6) {
       toast.error("Enter a 6-digit code");
       return;
@@ -63,49 +59,35 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 gradient-surface">
-      {/* Decorative blobs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 -right-32 h-80 w-80 rounded-full bg-primary/10 blur-[100px]" />
-        <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-accent/10 blur-[100px]" />
-      </div>
-
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative z-10 flex w-full max-w-sm flex-col items-center"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex w-full max-w-sm flex-col items-center"
       >
         {/* Logo */}
-        <motion.div
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow"
-        >
-          <Flame className="h-8 w-8 text-primary-foreground" />
-        </motion.div>
-
-        <h1 className="mb-1 text-3xl font-bold tracking-tight">
-          <span className="text-gradient">Join Rekindle</span>
+        <h1 className="mb-2 font-display text-3xl font-bold tracking-tight">
+          Rekindle
         </h1>
-        <p className="mb-8 text-center text-sm text-muted-foreground">
-          {step === "info" && "Tell us a bit about yourself"}
+        <p className="mb-10 text-center text-sm text-muted-foreground">
+          {step === "info" && "Tell us about yourself"}
           {step === "phone" && "Verify your phone number"}
           {step === "otp" && "Enter the code we sent you"}
         </p>
 
         {/* Step: Basic info */}
         {step === "info" && (
-          <motion.div key="info" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-4">
+          <motion.div key="info" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-5">
             {/* Avatar */}
             <div className="flex justify-center">
-              <label className="group relative flex h-20 w-20 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border bg-secondary transition-colors hover:border-primary">
+              <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border bg-secondary transition-colors hover:border-foreground">
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex flex-col items-center gap-1">
-                    <Camera className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    <span className="text-[10px] text-muted-foreground">Photo</span>
+                    <Camera className="h-6 w-6 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    <span className="text-[10px] text-muted-foreground">Add photo</span>
                   </div>
                 )}
                 <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
@@ -143,7 +125,7 @@ const Signup = () => {
 
         {/* Step: Phone */}
         {step === "phone" && (
-          <motion.div key="phone" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-4">
+          <motion.div key="phone" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-5">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">Phone Number</label>
               <Input
@@ -154,8 +136,8 @@ const Signup = () => {
                 className="h-12 rounded-xl border-border bg-secondary text-foreground placeholder:text-muted-foreground"
               />
             </div>
-            <Button variant="hero" size="lg" className="w-full" onClick={handleSendOtp} disabled={loading}>
-              {loading ? "Sending..." : "Send Code"}
+            <Button variant="hero" size="lg" className="w-full" onClick={handleSendOtp}>
+              Send Code
               <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
             <button onClick={() => setStep("info")} className="flex w-full items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -167,7 +149,7 @@ const Signup = () => {
 
         {/* Step: OTP */}
         {step === "otp" && (
-          <motion.div key="otp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-4">
+          <motion.div key="otp" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} className="w-full space-y-5">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">Verification Code</label>
               <Input
@@ -179,8 +161,8 @@ const Signup = () => {
                 className="h-12 rounded-xl border-border bg-secondary text-foreground text-center text-2xl tracking-[0.5em] placeholder:text-muted-foreground placeholder:tracking-[0.5em] placeholder:text-lg"
               />
             </div>
-            <Button variant="hero" size="lg" className="w-full" onClick={handleVerifyOtp} disabled={loading}>
-              {loading ? "Verifying..." : "Verify & Enter"}
+            <Button variant="hero" size="lg" className="w-full" onClick={handleVerifyOtp}>
+              Verify & Enter
               <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
             <button onClick={() => setStep("phone")} className="flex w-full items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">

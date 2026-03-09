@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import BottomNav from "@/components/BottomNav";
 import { MOCK_EVENTS } from "@/data/mockEvents";
-import { X, Heart, Flame } from "lucide-react";
+import { X, Heart, Compass } from "lucide-react";
 import { toast } from "sonner";
 
 const Feed = () => {
@@ -21,11 +21,9 @@ const Feed = () => {
 
       if (direction === "right") {
         setSwipedRight((prev) => [...prev, current.id]);
-        toast.success(`You're in for "${current.title}" 🔥`);
+        toast.success(`You're in for "${current.title}" ✦`);
       }
 
-      // Force a re-render so the exit animation picks up the ref value,
-      // then remove the card on the next tick
       forceUpdate((n) => n + 1);
       requestAnimationFrame(() => {
         setEvents((prev) => prev.slice(1));
@@ -39,15 +37,15 @@ const Feed = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col gradient-surface">
+    <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pb-2 pt-12">
+      <div className="flex items-center justify-between px-6 pb-3 pt-12">
         <div className="flex items-center gap-2">
-          <Flame className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold">Discover</h1>
+          <Compass className="h-5 w-5 text-foreground" />
+          <h1 className="font-display text-xl font-bold">Discover</h1>
         </div>
         <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
-          {events.length} events
+          {events.length} left
         </span>
       </div>
 
@@ -70,14 +68,14 @@ const Feed = () => {
                 ))
             ) : (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex h-full flex-col items-center justify-center text-center"
               >
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary">
-                  <Flame className="h-8 w-8 text-muted-foreground" />
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+                  <Compass className="h-7 w-7 text-muted-foreground" />
                 </div>
-                <h2 className="mb-2 text-xl font-bold">All caught up!</h2>
+                <h2 className="mb-2 font-display text-xl font-bold">All caught up!</h2>
                 <p className="text-sm text-muted-foreground">
                   Check back later for more events.
                 </p>
@@ -88,18 +86,18 @@ const Feed = () => {
 
         {/* Action buttons */}
         {events.length > 0 && (
-          <div className="mt-6 flex items-center gap-6">
+          <div className="mt-6 flex items-center gap-8">
             <button
               onClick={() => handleButtonSwipe("left")}
-              className="flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card shadow-card transition-transform hover:scale-110 active:scale-95"
+              className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-border bg-card shadow-card transition-transform hover:scale-105 active:scale-95"
             >
               <X className="h-7 w-7 text-muted-foreground" />
             </button>
             <button
               onClick={() => handleButtonSwipe("right")}
-              className="flex h-16 w-16 items-center justify-center rounded-full gradient-primary shadow-glow transition-transform hover:scale-110 active:scale-95"
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-accent shadow-card transition-transform hover:scale-105 active:scale-95"
             >
-              <Heart className="h-7 w-7 text-primary-foreground" />
+              <Heart className="h-7 w-7 text-accent-foreground" />
             </button>
           </div>
         )}
