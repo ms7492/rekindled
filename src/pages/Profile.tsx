@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
-import { Button } from "@/components/ui/button";
-import { LogOut, Calendar, Sun, Moon, Settings, ChevronRight } from "lucide-react";
+import { LogOut, Sun, Moon, ChevronRight } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -32,9 +31,9 @@ const Profile = () => {
   return (
     <div className="flex min-h-[100svh] flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-14 pb-2">
+      <div className="flex items-center justify-between px-6 pt-14 pb-3">
         <h1 className="font-display text-2xl font-bold">Profile</h1>
-        <button onClick={toggleTheme} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors">
+        <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-secondary transition-colors">
           {theme === "dark" ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
         </button>
       </div>
@@ -42,17 +41,17 @@ const Profile = () => {
       <div className="flex-1 px-6 pb-28">
         {/* Avatar & name */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col items-center py-8"
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+          className="flex flex-col items-center py-10"
         >
           <img
             src={MOCK_PROFILE.avatar}
             alt="Profile"
-            className="mb-4 h-28 w-28 rounded-full border-4 border-card bg-secondary shadow-card"
+            className="mb-5 h-32 w-32 rounded-full border-4 border-card bg-secondary shadow-elevated"
           />
-          <h2 className="font-display text-2xl font-bold">{MOCK_PROFILE.name}</h2>
+          <h2 className="font-display text-3xl font-bold">{MOCK_PROFILE.name}</h2>
         </motion.div>
 
         {/* Stats */}
@@ -60,16 +59,16 @@ const Profile = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08, duration: 0.5 }}
-          className="mb-8 grid grid-cols-3 gap-3"
+          className="mb-10 grid grid-cols-3 gap-3"
         >
           {[
             { label: "Hangs", value: MOCK_PROFILE.stats.hangs },
             { label: "Groups", value: MOCK_PROFILE.stats.groups },
             { label: "Connections", value: MOCK_PROFILE.stats.connections },
           ].map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-border bg-card p-4 text-center shadow-card">
-              <p className="font-display text-2xl font-bold">{stat.value}</p>
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+            <div key={stat.label} className="rounded-2xl bg-card/50 border border-border/50 p-5 text-center">
+              <p className="font-display text-3xl font-bold">{stat.value}</p>
+              <p className="mt-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -79,16 +78,16 @@ const Profile = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12, duration: 0.5 }}
-          className="mb-8"
+          className="mb-10"
         >
-          <h3 className="mb-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+          <h3 className="mb-4 border-b border-border pb-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">
             Interests
           </h3>
           <div className="flex flex-wrap gap-2">
             {MOCK_PROFILE.interests.map((interest) => (
               <span
                 key={interest}
-                className="rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-foreground"
+                className="rounded-full border border-border/50 bg-card/50 px-4 py-2 text-sm font-medium text-foreground"
               >
                 {interest}
               </span>
@@ -101,18 +100,18 @@ const Profile = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.16, duration: 0.5 }}
-          className="mb-8"
+          className="mb-10"
         >
-          <h3 className="mb-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+          <h3 className="mb-4 border-b border-border pb-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">
             Recent Hangs
           </h3>
           <div className="space-y-2">
             {MOCK_PROFILE.eventsAttended.map((event) => (
               <div
                 key={event.title}
-                className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 shadow-card"
+                className="flex items-center gap-4 rounded-2xl bg-card/50 border border-border/50 p-4"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-lg">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-lg">
                   {event.emoji}
                 </div>
                 <div className="flex-1">
@@ -125,7 +124,7 @@ const Profile = () => {
           </div>
         </motion.div>
 
-        {/* Actions */}
+        {/* Sign out */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -133,9 +132,9 @@ const Profile = () => {
         >
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:bg-secondary/50 shadow-card"
+            className="flex w-full items-center gap-3 rounded-2xl bg-card/50 border border-border/50 p-4 text-left transition-colors hover:bg-secondary/30"
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive/10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
               <LogOut className="h-5 w-5 text-destructive" />
             </div>
             <span className="font-medium text-destructive">Sign out</span>

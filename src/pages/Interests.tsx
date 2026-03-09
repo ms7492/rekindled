@@ -49,39 +49,41 @@ const Interests = () => {
     <div className="flex min-h-[100svh] flex-col bg-background">
       <div className="flex-1 px-6 py-14 sm:px-10">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
           className="mx-auto w-full max-w-lg"
         >
-          <span className="mb-3 inline-block text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <span className="mb-4 inline-block border-b border-border pb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             Step 2 of 2
           </span>
-          <h1 className="mb-2 font-display text-3xl font-bold sm:text-4xl">What are you into?</h1>
-          <p className="mb-10 text-muted-foreground">
+          <h1 className="mb-3 font-display text-4xl font-bold sm:text-5xl">
+            What are you into?
+          </h1>
+          <p className="mb-12 text-muted-foreground text-lg">
             Pick at least 3 so we can find your people.
           </p>
 
-          <div className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mb-12 flex flex-wrap gap-3">
             {INTERESTS.map((interest, i) => {
               const isSelected = selected.includes(interest.id);
               return (
                 <motion.button
                   key={interest.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.02, duration: 0.3 }}
                   onClick={() => toggle(interest.id)}
-                  className={`relative flex items-center gap-2.5 rounded-2xl border p-4 text-left transition-all ${
+                  className={`relative flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-all ${
                     isSelected
                       ? "border-foreground bg-foreground text-primary-foreground shadow-card"
-                      : "border-border bg-card text-foreground hover:border-foreground/20 hover:shadow-card"
+                      : "border-border bg-card/50 text-foreground hover:border-foreground/20 hover:bg-card"
                   }`}
                 >
-                  <span className="text-lg">{interest.emoji}</span>
-                  <span className="text-sm font-medium">{interest.label}</span>
+                  <span className="text-base">{interest.emoji}</span>
+                  <span>{interest.label}</span>
                   {isSelected && (
-                    <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                    <Check className="ml-1 h-3.5 w-3.5" />
                   )}
                 </motion.button>
               );
@@ -91,14 +93,13 @@ const Interests = () => {
       </div>
 
       {/* Sticky bottom bar */}
-      <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl px-6 py-4">
+      <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl px-6 py-5">
         <div className="mx-auto flex max-w-lg items-center justify-between">
           <span className="text-sm text-muted-foreground">
             {selected.length} selected
           </span>
           <Button
-            variant="hero"
-            size="lg"
+            className="rounded-full bg-foreground px-8 py-6 font-semibold text-primary-foreground hover:opacity-90"
             onClick={handleContinue}
             disabled={selected.length < 3}
           >

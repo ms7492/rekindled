@@ -91,10 +91,10 @@ const Signup = () => {
 
   const InputField = ({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) => (
     <div className="space-y-2">
-      <label className="text-[13px] font-medium text-foreground">{label}</label>
+      <label className="text-[13px] font-medium text-foreground/70">{label}</label>
       <Input
         {...props}
-        className="h-12 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-foreground"
+        className="h-13 rounded-xl border-border/50 bg-secondary/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-foreground/30 focus-visible:border-foreground/20"
       />
     </div>
   );
@@ -107,26 +107,31 @@ const Signup = () => {
 
   return (
     <div className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6">
+      {/* Subtle background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[400px] w-[400px] rounded-full bg-accent/[0.03] blur-[100px]" />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="flex w-full max-w-[380px] flex-col items-center"
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
+        className="relative flex w-full max-w-[400px] flex-col items-center"
       >
         {/* Logo */}
-        <h1 className="mb-1 font-display text-3xl font-bold tracking-tight">Rekindle</h1>
-        <p className="mb-10 text-center text-sm text-muted-foreground">{subtitle[step]}</p>
+        <h1 className="mb-2 font-display text-4xl font-bold tracking-tight">Rekindle</h1>
+        <p className="mb-12 text-center text-sm text-muted-foreground">{subtitle[step]}</p>
 
         <AnimatePresence mode="wait">
-          {/* ── Method chooser ── */}
+          {/* Method chooser */}
           {step === "method" && (
             <motion.div key="method" {...fade} className="w-full space-y-3">
               <button
-                onClick={() => { setStep("email-input"); }}
-                className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:shadow-card hover:border-foreground/20"
+                onClick={() => setStep("email-input")}
+                className="flex w-full items-center gap-4 rounded-2xl border border-border/50 bg-card/50 p-5 text-left transition-all hover:bg-card hover:border-foreground/10 hover:shadow-card"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
-                  <Mail className="h-5 w-5 text-foreground" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
+                  <Mail className="h-5 w-5 text-foreground/70" />
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Continue with Email</p>
@@ -134,33 +139,33 @@ const Signup = () => {
                 </div>
               </button>
               <button
-                onClick={() => { setStep("info"); }}
-                className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:shadow-card hover:border-foreground/20"
+                onClick={() => setStep("info")}
+                className="flex w-full items-center gap-4 rounded-2xl border border-border/50 bg-card/50 p-5 text-left transition-all hover:bg-card hover:border-foreground/10 hover:shadow-card"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
-                  <Phone className="h-5 w-5 text-foreground" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
+                  <Phone className="h-5 w-5 text-foreground/70" />
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Continue with Phone</p>
                   <p className="text-xs text-muted-foreground">Verify via SMS code</p>
                 </div>
               </button>
-              <p className="pt-6 text-center text-sm text-muted-foreground">
+              <p className="pt-8 text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <button onClick={() => { setIsLogin(true); setStep("email-input"); }} className="font-semibold text-foreground hover:underline">
+                <button onClick={() => { setIsLogin(true); setStep("email-input"); }} className="font-semibold text-foreground hover:underline underline-offset-4">
                   Sign in
                 </button>
               </p>
             </motion.div>
           )}
 
-          {/* ── Email form ── */}
+          {/* Email form */}
           {step === "email-input" && (
             <motion.div key="email" {...fade} className="w-full space-y-5">
               {!isLogin && (
                 <>
                   <div className="flex justify-center">
-                    <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border bg-card transition-all hover:border-foreground/30 hover:shadow-card">
+                    <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border/50 bg-card/50 transition-all hover:border-foreground/20 hover:shadow-card">
                       {avatarPreview ? (
                         <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
                       ) : (
@@ -177,13 +182,17 @@ const Signup = () => {
               )}
               <InputField label="Email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail((e.target as HTMLInputElement).value)} />
               <InputField label="Password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword((e.target as HTMLInputElement).value)} />
-              <Button variant="hero" size="lg" className="w-full" onClick={handleEmailSubmit} disabled={loading}>
+              <Button
+                className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90"
+                onClick={handleEmailSubmit}
+                disabled={loading}
+              >
                 {loading ? "Please wait..." : isLogin ? "Sign in" : "Create account"}
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
               <p className="text-center text-sm text-muted-foreground">
                 {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <button onClick={() => setIsLogin(!isLogin)} className="font-semibold text-foreground hover:underline">
+                <button onClick={() => setIsLogin(!isLogin)} className="font-semibold text-foreground hover:underline underline-offset-4">
                   {isLogin ? "Sign up" : "Sign in"}
                 </button>
               </p>
@@ -191,11 +200,11 @@ const Signup = () => {
             </motion.div>
           )}
 
-          {/* ── Phone flow: info ── */}
+          {/* Phone flow: info */}
           {step === "info" && (
             <motion.div key="info" {...fade} className="w-full space-y-5">
               <div className="flex justify-center">
-                <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border bg-card transition-all hover:border-foreground/30 hover:shadow-card">
+                <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border/50 bg-card/50 transition-all hover:border-foreground/20 hover:shadow-card">
                   {avatarPreview ? (
                     <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
                   ) : (
@@ -209,35 +218,35 @@ const Signup = () => {
               </div>
               <InputField label="Name" type="text" placeholder="Your name" value={name} onChange={(e) => setName((e.target as HTMLInputElement).value)} />
               <InputField label="Email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail((e.target as HTMLInputElement).value)} />
-              <Button variant="hero" size="lg" className="w-full" onClick={handleInfoContinue}>
+              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleInfoContinue}>
                 Continue <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
               <BackButton onClick={() => setStep("method")} />
             </motion.div>
           )}
 
-          {/* ── Phone input ── */}
+          {/* Phone input */}
           {step === "phone-input" && (
             <motion.div key="phone" {...fade} className="w-full space-y-5">
               <InputField label="Phone Number" type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone((e.target as HTMLInputElement).value)} />
-              <Button variant="hero" size="lg" className="w-full" onClick={handleSendOtp}>
+              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleSendOtp}>
                 Send Code <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
               <BackButton onClick={() => setStep("info")} />
             </motion.div>
           )}
 
-          {/* ── OTP ── */}
+          {/* OTP */}
           {step === "otp" && (
             <motion.div key="otp" {...fade} className="w-full space-y-5">
               <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground">Verification Code</label>
+                <label className="text-[13px] font-medium text-foreground/70">Verification Code</label>
                 <Input
                   type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6}
-                  className="h-14 rounded-xl border-border bg-card text-foreground text-center text-2xl tracking-[0.4em] placeholder:text-muted-foreground placeholder:tracking-[0.4em] placeholder:text-base focus-visible:ring-1 focus-visible:ring-foreground"
+                  className="h-14 rounded-xl border-border/50 bg-secondary/50 text-foreground text-center text-2xl tracking-[0.4em] placeholder:text-muted-foreground placeholder:tracking-[0.4em] placeholder:text-base focus-visible:ring-1 focus-visible:ring-foreground/30"
                 />
               </div>
-              <Button variant="hero" size="lg" className="w-full" onClick={handleVerifyOtp}>
+              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleVerifyOtp}>
                 Verify & Enter <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
               <BackButton onClick={() => setStep("phone-input")} text="Change number" />

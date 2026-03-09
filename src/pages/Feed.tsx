@@ -30,19 +30,19 @@ const Feed = () => {
   return (
     <div className="flex min-h-[100svh] flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pb-2 pt-14">
-        <div className="flex items-center gap-2.5">
+      <div className="flex items-center justify-between px-6 pb-3 pt-14">
+        <div className="flex items-center gap-3">
           <Flame className="h-5 w-5 text-accent" />
-          <h1 className="font-display text-xl font-bold">Discover</h1>
+          <h1 className="font-display text-2xl font-bold">Discover</h1>
         </div>
-        <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full bg-secondary px-3.5 py-1.5 text-xs font-medium text-muted-foreground">
           {events.length} left
         </span>
       </div>
 
       {/* Card stack */}
       <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center px-5 pb-24">
-        <div className="relative h-[460px] w-full sm:h-[500px]">
+        <div className="relative h-[480px] w-full sm:h-[520px]">
           <AnimatePresence>
             {events.length > 0 ? (
               events
@@ -63,11 +63,11 @@ const Feed = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex h-full flex-col items-center justify-center text-center"
               >
-                <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-secondary">
-                  <Flame className="h-8 w-8 text-muted-foreground" />
+                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-secondary">
+                  <Flame className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h2 className="mb-2 font-display text-xl font-bold">All caught up!</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="mb-3 font-display text-2xl font-bold">All caught up!</h2>
+                <p className="text-muted-foreground">
                   Check back later for more hangs.
                 </p>
               </motion.div>
@@ -77,10 +77,10 @@ const Feed = () => {
 
         {/* Action buttons */}
         {events.length > 0 && (
-          <div className="mt-8 flex items-center gap-10">
+          <div className="mt-10 flex items-center gap-12">
             <button
               onClick={() => handleSwipe("left")}
-              className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-border bg-card shadow-card transition-all hover:scale-105 hover:shadow-elevated active:scale-95"
+              className="flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card shadow-card transition-all hover:scale-105 hover:shadow-elevated active:scale-95"
             >
               <X className="h-7 w-7 text-muted-foreground" />
             </button>
