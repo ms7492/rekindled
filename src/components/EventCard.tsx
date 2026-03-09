@@ -21,7 +21,7 @@ interface EventCardProps {
 
 const EventCard = ({ event, onSwipe, isTop, swipeDirection }: EventCardProps) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 0, 300], [-8, 0, 8]);
+  const rotate = useTransform(x, [-300, 0, 300], [-6, 0, 6]);
   const likeOpacity = useTransform(x, [0, 100], [0, 1]);
   const nopeOpacity = useTransform(x, [-100, 0], [1, 0]);
 
@@ -33,48 +33,52 @@ const EventCard = ({ event, onSwipe, isTop, swipeDirection }: EventCardProps) =>
   if (!isTop) {
     return (
       <motion.div
-        className="absolute inset-0 overflow-hidden rounded-3xl bg-card shadow-card"
-        style={{ scale: 0.95, y: 12 }}
+        className="absolute inset-0 overflow-hidden rounded-[28px] bg-card shadow-card"
+        style={{ scale: 0.94, y: 14 }}
       >
-        <img src={event.image} alt={event.title} className="h-full w-full object-cover opacity-40" />
+        <img src={event.image} alt={event.title} className="h-full w-full object-cover opacity-30" />
       </motion.div>
     );
   }
 
   return (
     <motion.div
-      className="absolute inset-0 cursor-grab overflow-hidden rounded-3xl bg-card shadow-elevated active:cursor-grabbing"
+      className="absolute inset-0 cursor-grab overflow-hidden rounded-[28px] bg-card shadow-elevated active:cursor-grabbing"
       style={{ x, rotate }}
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.9}
+      dragElastic={0.8}
       onDragEnd={handleDragEnd}
       whileTap={{ scale: 1.01 }}
-      exit={{ x: swipeDirection === "right" ? 500 : -500, opacity: 0, transition: { duration: 0.3 } }}
+      exit={{ x: swipeDirection === "right" ? 500 : -500, opacity: 0, transition: { duration: 0.35 } }}
     >
-      {/* Full image */}
-      <div className="relative h-3/5">
+      {/* Image */}
+      <div className="relative h-[58%]">
         <img src={event.image} alt={event.title} className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
         {/* Swipe overlays */}
         <motion.div
-          className="absolute left-4 top-4 rounded-full bg-white/90 px-5 py-2"
+          className="absolute left-4 top-4 rounded-full bg-white px-5 py-2 shadow-elevated"
           style={{ opacity: likeOpacity }}
         >
-          <span className="text-sm font-bold text-accent">I'M IN ✦</span>
+          <span className="text-sm font-bold text-brand">I'M IN ✦</span>
         </motion.div>
         <motion.div
-          className="absolute right-4 top-4 rounded-full bg-white/90 px-5 py-2"
+          className="absolute right-4 top-4 rounded-full bg-white px-5 py-2 shadow-elevated"
           style={{ opacity: nopeOpacity }}
         >
           <span className="text-sm font-bold text-destructive">PASS</span>
         </motion.div>
 
-        {/* Tags on image */}
+        {/* Tags */}
         <div className="absolute bottom-3 left-4 flex gap-1.5">
           {event.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-[11px] font-medium" style={{ color: "hsl(220, 15%, 10%)" }}>
+            <span
+              key={tag}
+              className="rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-[11px] font-semibold"
+              style={{ color: "hsl(24, 10%, 10%)" }}
+            >
               {tag}
             </span>
           ))}
@@ -82,10 +86,10 @@ const EventCard = ({ event, onSwipe, isTop, swipeDirection }: EventCardProps) =>
       </div>
 
       {/* Content */}
-      <div className="flex h-2/5 flex-col justify-between p-5">
+      <div className="flex h-[42%] flex-col justify-between p-5">
         <div>
-          <h2 className="mb-1.5 font-display text-xl font-bold text-foreground">{event.title}</h2>
-          <p className="line-clamp-2 text-sm text-muted-foreground leading-relaxed">{event.description}</p>
+          <h2 className="mb-2 font-display text-xl font-bold text-foreground leading-tight">{event.title}</h2>
+          <p className="line-clamp-2 text-[13px] text-muted-foreground leading-relaxed">{event.description}</p>
         </div>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
