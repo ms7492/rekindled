@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, useScroll, useTransform, useInView, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Plus } from "lucide-react";
 import CustomCursor from "@/components/CustomCursor";
@@ -24,17 +24,17 @@ const SplitHeading = ({
   as?: "h1" | "h2" | "h3";
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
   const words = children.split(" ");
 
   return (
     <Tag ref={ref} className={className}>
       {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
+        <span key={i} className="inline-block mr-[0.3em]">
           <motion.span
             className="inline-block"
-            initial={{ y: "110%", opacity: 0 }}
-            animate={isInView ? { y: "0%", opacity: 1 } : {}}
+            initial={{ y: 40, opacity: 0 }}
+            animate={isInView ? { y: 0, opacity: 1 } : { y: 40, opacity: 0 }}
             transition={{
               duration: 0.7,
               ease: [0.22, 1, 0.36, 1],
@@ -64,7 +64,7 @@ const ScaleRevealImage = ({
   delay?: number;
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
     <div ref={ref} className="overflow-hidden rounded-3xl">
@@ -72,8 +72,8 @@ const ScaleRevealImage = ({
         src={src}
         alt={alt}
         className={className}
-        initial={{ scale: 1.15, opacity: 0 }}
-        animate={isInView ? { scale: 1, opacity: 1 } : {}}
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={isInView ? { scale: 1, opacity: 1 } : { scale: 1.1, opacity: 0 }}
         transition={{
           duration: 1.4,
           ease: [0.22, 1, 0.36, 1],
@@ -97,12 +97,12 @@ const FadeSection = ({
   delay?: number;
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      initial={{ opacity: 0, y: 24 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay }}
       className={className}
     >
@@ -116,7 +116,7 @@ const FadeSection = ({
    ───────────────────────────────────────────── */
 const HanddrawnArrow = ({ className = "" }: { className?: string }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-40px" });
+  const isInView = useInView(ref, { once: true });
 
   return (
     <motion.svg
