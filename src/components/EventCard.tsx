@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Calendar, MapPin, Users } from "lucide-react";
 
