@@ -1,17 +1,18 @@
 import { motion } from "framer-motion";
-import connectionImg from "@/assets/section-connection.jpg";
-import adventureImg from "@/assets/section-adventure.jpg";
-import gamesImg from "@/assets/section-games.jpg";
-import cheersImg from "@/assets/section-cheers.jpg";
 
-const fade = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as const } },
+const connectionImg = "/images/section-connection.jpg";
+const activityImg = "/images/section-activity.jpg";
+const afterImg = "/images/section-after.jpg";
+const cheersImg = "/images/section-cheers.jpg";
+
+const textUp = {
+  hidden: { opacity: 0, y: 60 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-const imgReveal = {
-  hidden: { opacity: 0, scale: 1.05 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 1.4, ease: [0.22, 1, 0.36, 1] as const } },
+const imgUp = {
+  hidden: { opacity: 0, y: 80, scale: 1.02 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 const StorySection = () => (
@@ -21,8 +22,8 @@ const StorySection = () => (
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        variants={fade}
+        viewport={{ once: true, margin: "-120px" }}
+        variants={textUp}
         className="mx-auto max-w-4xl text-center"
       >
         <h2 className="font-display text-4xl font-bold leading-[1.1] text-white sm:text-5xl lg:text-6xl text-balance">
@@ -40,31 +41,31 @@ const StorySection = () => (
         headline: "Don't walk in blind.",
         body: "You see the activity, the vibe, the group size, who's hosting. You decide if it's for you — before you show up.",
         img: connectionImg,
-        alt: "Two friends having a conversation in the park",
+        alt: "Friends connecting over conversation",
       },
       {
         tag: "During",
         headline: "The activity carries you.",
         body: "The host makes sure nobody's standing alone. The small group means you actually get to know people.",
-        img: adventureImg,
-        alt: "Group cooking together in a warm kitchen",
+        img: activityImg,
+        alt: "Group of friends enjoying an activity together",
         reverse: true,
       },
       {
         tag: "After",
         headline: "One hang plants the seed.",
         body: "Group chat opens. Follow-up hangs happen if the group clicks. Your future matches improve based on feedback.",
-        img: gamesImg,
-        alt: "Friends playing board games together",
+        img: afterImg,
+        alt: "Friends celebrating together",
       },
     ].map((section) => (
       <section key={section.tag} className="overflow-hidden">
-        <div className={`grid min-h-[80vh] lg:grid-cols-2`}>
+        <div className="grid min-h-[80vh] lg:grid-cols-2">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={fade}
+            viewport={{ once: true, margin: "-100px" }}
+            variants={textUp}
             className={`flex flex-col justify-center px-6 py-20 lg:px-16 xl:px-24 ${
               section.reverse ? "lg:order-2" : ""
             }`}
@@ -83,8 +84,8 @@ const StorySection = () => (
             <motion.img
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
-              variants={imgReveal}
+              viewport={{ once: true, margin: "-50px" }}
+              variants={imgUp}
               src={section.img}
               alt={section.alt}
               className="h-full min-h-[50vh] w-full object-cover"
@@ -97,23 +98,23 @@ const StorySection = () => (
     {/* Full-bleed image break */}
     <section className="relative h-[60vh] overflow-hidden">
       <motion.img
-        initial={{ scale: 1.08 }}
-        whileInView={{ scale: 1 }}
+        initial={{ scale: 1.08, opacity: 0 }}
+        whileInView={{ scale: 1, opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] as const }}
         src={cheersImg}
-        alt="Friends raising glasses in celebration"
+        alt="Friends celebrating together"
         className="h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,20%,8%)] via-transparent to-[hsl(220,20%,8%)]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,20%,8%)] via-[hsl(220,20%,8%,0.3)] to-[hsl(220,20%,8%,0.6)]" />
       <motion.div
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-80px" }}
-        variants={fade}
-        className="absolute inset-0 flex items-center justify-center"
+        variants={textUp}
+        className="absolute inset-0 flex items-center justify-center px-6"
       >
-        <p className="font-display text-3xl font-bold italic text-white/80 sm:text-4xl lg:text-5xl">
+        <p className="font-display text-3xl font-bold italic text-white/80 text-center sm:text-4xl lg:text-5xl">
           "We're hanging out again this weekend."
         </p>
       </motion.div>

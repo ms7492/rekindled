@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImg from "@/assets/hero-friends.jpg";
+
+const heroImg = "/images/hero-friends.jpg";
 
 const fade = {
   hidden: { opacity: 0, y: 30 },
@@ -14,7 +15,6 @@ const fade = {
 
 const HeroSection = ({ onAction }: { onAction: () => void }) => (
   <section className="relative flex min-h-[100svh] items-center overflow-hidden">
-    {/* Background image with parallax feel */}
     <motion.div
       initial={{ scale: 1.1 }}
       animate={{ scale: 1 }}
@@ -23,15 +23,13 @@ const HeroSection = ({ onAction }: { onAction: () => void }) => (
     >
       <img
         src={heroImg}
-        alt="Friends laughing together at golden hour"
+        alt="Friends laughing together"
         className="h-full w-full object-cover"
       />
     </motion.div>
 
-    {/* Gradient overlay — cinematic */}
     <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,20%,8%)] via-[hsl(220,20%,8%,0.4)] to-[hsl(220,20%,8%,0.3)]" />
 
-    {/* Content */}
     <div className="relative z-10 w-full px-6 lg:px-12">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-2xl pt-20">
@@ -80,7 +78,6 @@ const HeroSection = ({ onAction }: { onAction: () => void }) => (
       </div>
     </div>
 
-    {/* Scroll indicator */}
     <motion.div
       animate={{ y: [0, 8, 0] }}
       transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}

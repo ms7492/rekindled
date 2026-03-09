@@ -1,73 +1,113 @@
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TESTIMONIALS = [
   {
-    text: "I showed up alone and left with three people's numbers.",
+    text: "I showed up alone and left with three people's numbers. Best decision I made all month.",
     author: "Sarah",
     age: "26",
   },
   {
-    text: "Knowing it was only 6 people made me actually go.",
+    text: "Knowing it was only 6 people made me actually go. Big events paralyze me — this didn't.",
     author: "Marcus",
     age: "28",
   },
   {
-    text: "The group chat after was the best part.",
+    text: "The group chat after was the best part. We're hanging out again this weekend.",
     author: "Priya",
     age: "24",
   },
+  {
+    text: "I've tried meetup apps before. This is the first one where I actually made friends.",
+    author: "Jake",
+    age: "31",
+  },
 ];
 
-const fade = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const } },
-};
+const DURATION = 4000;
 
-const stagger = {
-  visible: { transition: { staggerChildren: 0.12 } },
-};
+const TestimonialsSection = () => {
+  const [active, setActive] = useState(0);
+  const [progress, setProgress] = useState(0);
 
-const TestimonialsSection = () => (
-  <section className="px-6 py-32 lg:px-12 lg:py-44">
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      variants={stagger}
-      className="mx-auto max-w-6xl"
-    >
-      <motion.p
-        variants={fade}
-        className="mb-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/30"
+  const goTo = useCallback((idx: number) => {
+    setActive(idx);
+    setProgress(0);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) {
+          setActive((a) => (a + 1) % TESTIMONIALS.length);
+          return 0;
+        }
+        return p + (100 / (DURATION / 50));
+      });
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  const t = TESTIMONIALS[active];
+
+  return (
+    <section className="px-6 py-32 lg:px-12 lg:py-44">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] as const }}
+        className="mx-auto max-w-4xl"
       >
-        After one hang
-      </motion.p>
-      <motion.h2
-        variants={fade}
-        className="mb-20 font-display text-4xl font-bold text-white sm:text-5xl"
-      >
-        Real people, real&nbsp;stories.
-      </motion.h2>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/30">
+          After one hang
+        </p>
+        <h2 className="mb-16 font-display text-4xl font-bold text-white sm:text-5xl">
+          Real people, real&nbsp;stories.
+        </h2>
 
-      <div className="grid gap-px overflow-hidden rounded-3xl border border-white/8 sm:grid-cols-3">
-        {TESTIMONIALS.map((t) => (
-          <motion.div
-            key={t.author}
-            variants={fade}
-            className="flex flex-col justify-between bg-white/[0.03] p-10 backdrop-blur-sm transition-colors hover:bg-white/[0.06]"
-          >
-            <p className="mb-10 font-display text-xl italic leading-relaxed text-white/80 lg:text-2xl">
-              "{t.text}"
-            </p>
-            <div>
-              <p className="text-sm font-semibold text-white/60">{t.author}</p>
-              <p className="text-xs text-white/25">{t.age}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  </section>
-);
+        {/* Progress bars */}
+        <div className="mb-12 flex gap-2">
+          {TESTIMONIALS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className="relative h-[3px] flex-1 cursor-pointer overflow-hidden rounded-full bg-white/10"
+            >
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-white/60 transition-none"
+                style={{
+                  width: i === active ? `${Math.min(progress, 100)}%` : i < active ? "100%" : "0%",
+                  transition: i === active ? "none" : "width 0.3s ease",
+                }}
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* Quote */}
+        <div className="min-h-[200px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
+            >
+              <p className="mb-8 font-display text-2xl italic leading-relaxed text-white/80 sm:text-3xl lg:text-4xl">
+                "{t.text}"
+              </p>
+              <div>
+                <p className="text-sm font-semibold text-white/60">{t.author}</p>
+                <p className="text-xs text-white/25">{t.age}</p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </section>
+  );
+};
 
 export default TestimonialsSection;
