@@ -38,7 +38,15 @@ const Feed = () => {
 
   return (
     <AppShell>
-      <div className="flex flex-1 flex-col bg-background">
+      <div className="relative flex flex-1 flex-col bg-background overflow-hidden">
+        {/* Background decorations */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-accent/[0.04] blur-[100px]" />
+          <div className="absolute top-1/2 -left-60 h-[400px] w-[400px] rounded-full bg-primary/[0.03] blur-[80px]" />
+          <div className="absolute bottom-20 right-1/4 h-[300px] w-[300px] rounded-full bg-accent/[0.03] blur-[90px]" />
+          {/* Dot grid pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(hsl(var(--foreground)) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        </div>
         {/* Desktop layout */}
         <div className="flex flex-1">
           {/* Main card area */}
@@ -180,7 +188,7 @@ const Feed = () => {
                   <div key={stat.label} className="rounded-xl bg-secondary/50 p-3 text-center">
                     <p className="font-display text-xl font-bold text-foreground">{stat.value}</p>
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-                  </div>
+        </div>
                 ))}
               </div>
             </div>
