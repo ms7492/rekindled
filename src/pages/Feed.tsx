@@ -3,16 +3,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import AppShell from "@/components/AppShell";
 import { MOCK_EVENTS } from "@/data/mockEvents";
-import { X, Heart, Flame, TrendingUp, Calendar, Sparkles } from "lucide-react";
+import { X, Heart, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 const TRENDING_TAGS = ["🔥 Trending", "🎵 Music", "🍕 Food", "💻 Tech", "🧘 Wellness", "🎨 Art"];
-
-const UPCOMING = [
-  { title: "Jazz & Wine Night", date: "Tomorrow", emoji: "🎷", spots: 4 },
-  { title: "Ramen Crawl", date: "Saturday", emoji: "🍜", spots: 2 },
-  { title: "Morning Run Club", date: "Sunday", emoji: "🏃", spots: 8 },
-];
 
 const Feed = () => {
   const [events, setEvents] = useState(MOCK_EVENTS);
@@ -133,66 +127,6 @@ const Feed = () => {
             </div>
           </div>
 
-          {/* Desktop right sidebar */}
-          <div className="hidden xl:flex xl:w-[320px] xl:flex-col xl:border-l xl:border-border xl:bg-card/30">
-            {/* Upcoming hangs */}
-            <div className="border-b border-border px-6 py-5">
-              <h3 className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                <Calendar className="h-3.5 w-3.5" />
-                Coming up
-              </h3>
-              <div className="space-y-3">
-                {UPCOMING.map((item) => (
-                  <div key={item.title} className="flex items-center gap-3 rounded-xl bg-secondary/50 p-3">
-                    <span className="text-xl">{item.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
-                      <p className="text-[11px] text-muted-foreground">{item.date} · {item.spots} spots left</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Your interests */}
-            <div className="border-b border-border px-6 py-5">
-              <h3 className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5" />
-                Your vibes
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {["Music", "Tech", "Food", "Outdoors", "Art"].map((interest) => (
-                  <span
-                    key={interest}
-                    className="rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-foreground"
-                  >
-                    {interest}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="px-6 py-5">
-              <h3 className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                <TrendingUp className="h-3.5 w-3.5" />
-                Your activity
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Hangs", value: "3" },
-                  { label: "Connections", value: "12" },
-                  { label: "Groups", value: "2" },
-                  { label: "This week", value: "1" },
-                ].map((stat) => (
-                  <div key={stat.label} className="rounded-xl bg-secondary/50 p-3 text-center">
-                    <p className="font-display text-xl font-bold text-foreground">{stat.value}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-        </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </AppShell>
