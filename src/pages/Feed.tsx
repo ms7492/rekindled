@@ -188,7 +188,7 @@ const Feed = () => {
                   <div key={stat.label} className="rounded-xl bg-secondary/50 p-3 text-center">
                     <p className="font-display text-xl font-bold text-foreground">{stat.value}</p>
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-                  </div>
+        </div>
                 ))}
               </div>
             </div>
