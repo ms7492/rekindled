@@ -31,8 +31,8 @@ const Chat = () => {
   return (
     <div className="flex h-[100svh] flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-border bg-card px-4 pb-3.5 pt-14">
-        <button onClick={() => navigate("/rooms")} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors">
+      <div className="flex items-center gap-3 border-b border-border bg-card px-4 pb-3.5 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
+        <button onClick={() => navigate("/rooms")} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors -ml-1">
           <ArrowLeft className="h-5 w-5 text-foreground" />
         </button>
         <div className="flex-1 min-w-0">
@@ -49,38 +49,37 @@ const Chat = () => {
         {messages.map((msg, i) => {
           const isMe = msg.senderId === "me";
           const isAI = msg.isAI;
-
           return (
             <motion.div
               key={msg.id}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.03, duration: 0.3 }}
+              transition={{ delay: i * 0.03, duration: 0.35 }}
               className={`flex gap-2.5 ${isMe ? "flex-row-reverse" : "flex-row"}`}
             >
               {!isMe && (
                 <div className="flex-shrink-0 pt-5">
                   {isAI ? (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
-                      <Sparkles className="h-4 w-4 text-accent" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand/10">
+                      <Sparkles className="h-4 w-4 text-brand" />
                     </div>
                   ) : (
                     <img src={msg.senderAvatar} alt={msg.senderName} className="h-8 w-8 rounded-full bg-secondary" />
                   )}
                 </div>
               )}
-              <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"}`}>
+              <div className={`max-w-[78%] ${isMe ? "items-end" : "items-start"}`}>
                 {!isMe && (
-                  <span className={`mb-1 block text-[11px] font-medium ${isAI ? "text-accent" : "text-muted-foreground"}`}>
+                  <span className={`mb-1 block text-[11px] font-medium ${isAI ? "text-brand" : "text-muted-foreground"}`}>
                     {msg.senderName}
                   </span>
                 )}
                 <div
-                  className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  className={`rounded-[20px] px-4 py-3 text-[14px] leading-relaxed ${
                     isMe
                       ? "bg-foreground text-primary-foreground rounded-br-lg"
                       : isAI
-                      ? "bg-accent/8 text-foreground border border-accent/15 rounded-bl-lg"
+                      ? "bg-brand/8 text-foreground border border-brand/12 rounded-bl-lg"
                       : "bg-card border border-border text-foreground rounded-bl-lg"
                   }`}
                 >
@@ -101,12 +100,12 @@ const Chat = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 rounded-full border-border bg-secondary text-foreground placeholder:text-muted-foreground h-11 px-4"
+            className="flex-1 rounded-full border-border bg-secondary text-foreground placeholder:text-muted-foreground h-11 px-5"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim()}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground text-primary-foreground transition-all hover:opacity-90 active:scale-95 disabled:opacity-30"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground text-primary-foreground transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-25"
           >
             <Send className="h-4 w-4" />
           </button>

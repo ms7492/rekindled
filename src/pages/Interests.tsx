@@ -47,22 +47,22 @@ const Interests = () => {
 
   return (
     <div className="flex min-h-[100svh] flex-col bg-background">
-      <div className="flex-1 px-6 py-14 sm:px-10">
+      <div className="flex-1 px-6 py-16 sm:px-10">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto w-full max-w-lg"
         >
-          <span className="mb-3 inline-block text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <span className="mb-4 inline-block text-[11px] font-semibold uppercase tracking-widest text-brand">
             Step 2 of 2
           </span>
-          <h1 className="mb-2 font-display text-3xl font-bold sm:text-4xl">What are you into?</h1>
-          <p className="mb-10 text-muted-foreground">
-            Pick at least 3 so we can find your people.
+          <h1 className="mb-3 font-display text-display-md font-bold">What are you into?</h1>
+          <p className="mb-10 text-muted-foreground leading-relaxed">
+            Pick at least 3 so we can match you with your kind of people.
           </p>
 
-          <div className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mb-12 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
             {INTERESTS.map((interest, i) => {
               const isSelected = selected.includes(interest.id);
               return (
@@ -70,18 +70,24 @@ const Interests = () => {
                   key={interest.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.02, duration: 0.3 }}
+                  transition={{ delay: i * 0.02, duration: 0.35 }}
                   onClick={() => toggle(interest.id)}
-                  className={`relative flex items-center gap-2.5 rounded-2xl border p-4 text-left transition-all ${
+                  className={`relative flex items-center gap-2.5 rounded-2xl border p-3.5 text-left transition-all duration-200 ${
                     isSelected
-                      ? "border-foreground bg-foreground text-primary-foreground shadow-card"
-                      : "border-border bg-card text-foreground hover:border-foreground/20 hover:shadow-card"
+                      ? "border-brand bg-brand text-brand-foreground shadow-card"
+                      : "border-border bg-card text-foreground hover:border-brand/30 hover:shadow-card"
                   }`}
                 >
-                  <span className="text-lg">{interest.emoji}</span>
-                  <span className="text-sm font-medium">{interest.label}</span>
+                  <span className="text-base">{interest.emoji}</span>
+                  <span className="text-[13px] font-medium">{interest.label}</span>
                   {isSelected && (
-                    <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2"
+                    >
+                      <Check className="h-4 w-4" />
+                    </motion.div>
                   )}
                 </motion.button>
               );
@@ -90,20 +96,21 @@ const Interests = () => {
         </motion.div>
       </div>
 
-      {/* Sticky bottom bar */}
+      {/* Sticky footer */}
       <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl px-6 py-4">
         <div className="mx-auto flex max-w-lg items-center justify-between">
           <span className="text-sm text-muted-foreground">
-            {selected.length} selected
+            <span className="font-semibold text-foreground">{selected.length}</span> selected
           </span>
           <Button
             variant="hero"
             size="lg"
             onClick={handleContinue}
             disabled={selected.length < 3}
+            className="group"
           >
             Continue
-            <ArrowRight className="ml-1.5 h-4 w-4" />
+            <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Button>
         </div>
       </div>
