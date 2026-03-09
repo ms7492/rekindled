@@ -3,16 +3,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import AppShell from "@/components/AppShell";
 import { MOCK_EVENTS } from "@/data/mockEvents";
-import { X, Heart, Flame, TrendingUp, Calendar, Sparkles } from "lucide-react";
+import { X, Heart, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 const TRENDING_TAGS = ["🔥 Trending", "🎵 Music", "🍕 Food", "💻 Tech", "🧘 Wellness", "🎨 Art"];
-
-const UPCOMING = [
-  { title: "Jazz & Wine Night", date: "Tomorrow", emoji: "🎷", spots: 4 },
-  { title: "Ramen Crawl", date: "Saturday", emoji: "🍜", spots: 2 },
-  { title: "Morning Run Club", date: "Sunday", emoji: "🏃", spots: 8 },
-];
 
 const Feed = () => {
   const [events, setEvents] = useState(MOCK_EVENTS);
