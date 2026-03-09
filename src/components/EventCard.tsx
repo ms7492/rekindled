@@ -17,10 +17,11 @@ interface EventCardProps {
   event: EventData;
   onSwipe: (direction: "left" | "right") => void;
   isTop: boolean;
+  swipeDirection: "left" | "right";
 }
 
-const EventCard = ({ event, onSwipe, isTop }: EventCardProps) => {
-  const [exitX, setExitX] = useState(0);
+const EventCard = ({ event, onSwipe, isTop, swipeDirection }: EventCardProps) => {
+  const x = useMotionValue(0);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-15, 0, 15]);
   const likeOpacity = useTransform(x, [0, 100], [0, 1]);
