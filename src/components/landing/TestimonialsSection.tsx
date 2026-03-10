@@ -95,7 +95,7 @@ const TestimonialsSection = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
             >
-              <p className="mb-8 font-display text-2xl italic leading-relaxed text-white/80 sm:text-3xl lg:text-4xl">
+              <p className="mb-8 font-display text-2xl leading-relaxed text-white/80 sm:text-3xl lg:text-4xl">
                 "{t.text}"
               </p>
               <div>
