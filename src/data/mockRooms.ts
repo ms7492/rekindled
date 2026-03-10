@@ -57,7 +57,7 @@ export const MOCK_CHAT: ChatMessage[] = [
   {
     id: "m1",
     senderId: "ai",
-    senderName: "Rekindle AI",
+    senderName: "Rekindled AI",
     senderAvatar: "",
     content: "Welcome to the Indie Music Night room! 🎵 I'm here to help break the ice. Let's start — what's a song that's been on repeat for you lately?",
     timestamp: "5:30 PM",
@@ -82,7 +82,7 @@ export const MOCK_CHAT: ChatMessage[] = [
   {
     id: "m4",
     senderId: "ai",
-    senderName: "Rekindle AI",
+    senderName: "Rekindled AI",
     senderAvatar: "",
     content: "Love it! Looks like we have some eclectic music fans here 🔥 Has anyone been to The Basement before?",
     timestamp: "5:33 PM",

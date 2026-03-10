@@ -4,7 +4,7 @@ const LandingFooter = () => (
       <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
         <div className="sm:col-span-2 lg:col-span-1">
-          <span className="font-display text-2xl font-bold text-white">Rekindle</span>
+          <span className="font-display text-2xl font-bold text-white">Rekindled</span>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/30">
             Making showing up feel easier. Small groups, real activities, real friendships.
           </p>
@@ -50,7 +50,7 @@ const LandingFooter = () => (
       {/* Bottom bar */}
       <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/6 pt-8 sm:flex-row">
         <p className="text-xs text-white/20">
-          © 2026 Rekindle, Inc. All rights reserved.
+          © 2026 Rekindled, Inc. All rights reserved.
         </p>
         <div className="flex gap-6">
           {["Twitter", "Instagram", "TikTok"].map((s) => (

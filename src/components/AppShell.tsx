@@ -24,7 +24,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
       <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:border-r lg:border-border lg:bg-card/50">
         <div className="flex h-16 items-center px-6">
           <a href="/" className="font-display text-xl font-bold text-foreground tracking-tight">
-            Rekindle
+            Rekindled
           </a>
         </div>
         <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
@@ -78,7 +78,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         {/* Mobile top bar */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3 lg:hidden">
           <a href="/" className="font-display text-lg font-bold text-foreground tracking-tight">
-            Rekindle
+            Rekindled
           </a>
           <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors">

@@ -79,7 +79,7 @@ const Signup = () => {
     if (otp.length < 6) { toast.error("Enter a 6-digit code"); return; }
     localStorage.setItem("rekindle_name", name);
     localStorage.setItem("rekindle_email", email);
-    toast.success("Welcome to Rekindle!");
+    toast.success("Welcome to Rekindled!");
     navigate("/interests");
   };
 
@@ -119,7 +119,7 @@ const Signup = () => {
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
         className="relative flex w-full max-w-[400px] flex-col items-center"
       >
-        <h1 className="mb-2 font-display text-4xl font-bold tracking-tight">Rekindle</h1>
+        <h1 className="mb-2 font-display text-4xl font-bold tracking-tight">Rekindled</h1>
         <p className="mb-12 text-center text-sm text-muted-foreground">{subtitle[step]}</p>
 
         <AnimatePresence mode="wait">
