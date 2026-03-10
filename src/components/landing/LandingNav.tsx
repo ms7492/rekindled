@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 const LandingNav = ({ onAction }: { onAction: () => void }) => (
-  <nav className="fixed top-0 z-50 w-full">
-    <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-12">
+  <nav className="fixed top-0 z-50 w-full px-6 lg:px-12">
+    <div className="mx-auto flex h-20 max-w-7xl items-center justify-between">
       <div className="flex flex-col">
         <a href="/" className="font-display text-2xl font-bold tracking-tight text-white leading-none">
           Rekindled
