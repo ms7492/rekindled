@@ -28,6 +28,9 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
           <h1 className="font-display text-5xl font-bold text-primary-foreground tracking-tight sm:text-6xl">
             Rekindled
           </h1>
+          <p className="mt-3 text-lg text-primary-foreground/50 tracking-wide">
+            Making showing up feel easier.
+          </p>
         </motion.div>
       </motion.div>
     </AnimatePresence>
