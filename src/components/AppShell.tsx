@@ -78,7 +78,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         {/* Mobile top bar */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3 lg:hidden">
           <a href="/" className="font-display text-lg font-bold text-foreground tracking-tight">
-            Rekindle
+            Rekindled
           </a>
           <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors">

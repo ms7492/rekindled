@@ -50,7 +50,7 @@ const LandingFooter = () => (
       {/* Bottom bar */}
       <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/6 pt-8 sm:flex-row">
         <p className="text-xs text-white/20">
-          © 2026 Rekindle, Inc. All rights reserved.
+          © 2026 Rekindled, Inc. All rights reserved.
         </p>
         <div className="flex gap-6">
           {["Twitter", "Instagram", "TikTok"].map((s) => (

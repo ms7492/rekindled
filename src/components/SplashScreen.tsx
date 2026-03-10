@@ -26,7 +26,7 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <h1 className="font-display text-5xl font-bold text-primary-foreground tracking-tight sm:text-6xl">
-            Rekindle
+            Rekindled
           </h1>
         </motion.div>
       </motion.div>
