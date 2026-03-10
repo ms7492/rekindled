@@ -24,7 +24,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
       <aside className="hidden lg:flex lg:w-[260px] lg:flex-col lg:border-r lg:border-border lg:bg-card/50">
         <div className="flex h-16 items-center px-6">
           <a href="/" className="font-display text-xl font-bold text-foreground tracking-tight">
-            Rekindle
+            Rekindled
           </a>
         </div>
         <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
