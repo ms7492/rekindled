@@ -4,7 +4,7 @@ const LandingFooter = () => (
       <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
         <div className="sm:col-span-2 lg:col-span-1">
-          <span className="font-display text-2xl font-bold text-white">Rekindle</span>
+          <span className="font-display text-2xl font-bold text-white">Rekindled</span>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/30">
             Making showing up feel easier. Small groups, real activities, real friendships.
           </p>
