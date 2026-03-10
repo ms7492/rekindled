@@ -79,7 +79,7 @@ const Signup = () => {
     if (otp.length < 6) { toast.error("Enter a 6-digit code"); return; }
     localStorage.setItem("rekindle_name", name);
     localStorage.setItem("rekindle_email", email);
-    toast.success("Welcome to Rekindle!");
+    toast.success("Welcome to Rekindled!");
     navigate("/interests");
   };
 
