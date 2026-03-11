@@ -18,7 +18,7 @@ interface RoomMember {
 const Chat = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<ChatMessage[]>(MOCK_CHAT);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [roomTitle, setRoomTitle] = useState("");
   const [members, setMembers] = useState<RoomMember[]>([]);
