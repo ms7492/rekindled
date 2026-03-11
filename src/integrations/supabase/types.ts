@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_ai: boolean
+          room_id: string
+          sender_name: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_ai?: boolean
+          room_id: string
+          sender_name: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_ai?: boolean
+          room_id?: string
+          sender_name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
