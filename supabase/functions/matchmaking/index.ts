@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
@@ -11,6 +11,7 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  try {
     // Parse optional event_titles from request body
     let eventTitles: Record<string, string> = {};
     try {
@@ -23,7 +24,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Find events with 3+ right-swipes that don't have a room yet
     const { data: swipeGroups, error: swipeErr } = await supabase
       .from("swipes")
       .select("event_id")
@@ -31,14 +31,12 @@ Deno.serve(async (req) => {
 
     if (swipeErr) throw swipeErr;
 
-    // Group swipes by event_id
     const eventSwipes: Record<string, boolean> = {};
     for (const s of swipeGroups || []) {
       eventSwipes[s.event_id] = true;
     }
     const eventIds = Object.keys(eventSwipes);
 
-    // Check which events already have rooms
     const { data: existingRooms, error: roomErr } = await supabase
       .from("rooms")
       .select("event_id")
@@ -47,15 +45,12 @@ Deno.serve(async (req) => {
     if (roomErr) throw roomErr;
 
     const existingEventIds = new Set((existingRooms || []).map((r: any) => r.event_id));
-
-    // For each event without a room, count right-swipes
     const newEventIds = eventIds.filter((id) => !existingEventIds.has(id));
 
     let roomsCreated = 0;
     let usersAdded = 0;
 
     for (const eventId of newEventIds) {
-      // Get all users who swiped right on this event
       const { data: swipes, error: sErr } = await supabase
         .from("swipes")
         .select("user_id")
@@ -65,7 +60,6 @@ Deno.serve(async (req) => {
       if (sErr) throw sErr;
       if (!swipes || swipes.length < 3) continue;
 
-      // Create room with title from request body or fallback to event_id
       const { data: room, error: rErr } = await supabase
         .from("rooms")
         .insert({ event_id: eventId, event_title: eventTitles[eventId] || `Event ${eventId}` })
@@ -74,29 +68,25 @@ Deno.serve(async (req) => {
 
       if (rErr) throw rErr;
 
-      // Add users to room
       const members = swipes.map((s: any) => ({
         room_id: room.id,
         user_id: s.user_id,
       }));
 
-      const { error: mErr } = await supabase
-        .from("room_users")
-        .insert(members);
-
+      const { error: mErr } = await supabase.from("room_users").insert(members);
       if (mErr) throw mErr;
 
       roomsCreated++;
       usersAdded += members.length;
     }
 
-    // Also check existing rooms for new swipers to add
+    // Add new swipers to existing rooms
     for (const eventId of Array.from(existingEventIds)) {
       const { data: room } = await supabase
         .from("rooms")
         .select("id")
         .eq("event_id", eventId)
-        .single();
+        .maybeSingle();
 
       if (!room) continue;
 
