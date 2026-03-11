@@ -63,21 +63,34 @@ const Feed = () => {
   const [events, setEvents] = useState(sortedEvents);
   const [activeCategory, setActiveCategory] = useState("all");
 
-  // Fetch real right-swipe counts from the database
+  // Fetch swipe counts AND filter out events user already swiped on
   useEffect(() => {
-    const fetchCounts = async () => {
-      const { data, error } = await supabase
+    const fetchData = async () => {
+      // Get counts for all events
+      const { data: allSwipes } = await supabase
         .from("swipes")
         .select("event_id")
         .eq("direction", "right");
-      if (error || !data) return;
+
       const counts: Record<string, number> = {};
-      for (const row of data) {
+      for (const row of allSwipes || []) {
         counts[row.event_id] = (counts[row.event_id] || 0) + 1;
       }
       setSwipeCounts(counts);
+
+      // Filter out events user already swiped on
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: userSwipes } = await supabase
+          .from("swipes")
+          .select("event_id")
+          .eq("user_id", user.id);
+
+        const swipedIds = new Set((userSwipes || []).map((s) => s.event_id));
+        setEvents((prev) => prev.filter((e) => !swipedIds.has(e.id)));
+      }
     };
-    fetchCounts();
+    fetchData();
   }, []);
 
   const activeCat = CATEGORIES.find((c) => c.value === activeCategory) || CATEGORIES[0];
@@ -99,20 +112,20 @@ const Feed = () => {
         .from("swipes")
         .insert({ user_id: user.id, event_id: id, direction: "right" });
 
-      if (error) {
-        if (error.code === "23505") {
-          toast.info("You already joined this hang!");
-        } else {
-          toast.error("Something went wrong");
-        }
+      if (error && error.code !== "23505") {
+        toast.error("Something went wrong");
         return;
       }
 
-      toast.success(`You're in for "${event.title}" ✦`);
-      setEvents((prev) => prev.filter((e) => e.id !== id));
-      setSwipeCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+      if (error?.code === "23505") {
+        toast.info("You already joined this hang!");
+      } else {
+        toast.success(`You're in for "${event.title}" ✦`);
+        setSwipeCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+      }
 
-      // Trigger matchmaking so room is created immediately if threshold met
+      // Always remove the card and trigger matchmaking
+      setEvents((prev) => prev.filter((e) => e.id !== id));
       supabase.functions.invoke("matchmaking").catch(() => {});
     },
     [events]
