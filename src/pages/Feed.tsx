@@ -152,7 +152,7 @@ const Feed = () => {
           {events.length > 0 ? (
             <>
               {/* Card container */}
-              <div className="relative w-full max-w-[380px] aspect-[3/4.5] sm:aspect-[3/4.2]">
+              <div className="relative w-full max-w-[520px] aspect-[3/5] sm:aspect-[3/4.5]">
                 <AnimatePresence>
                   {events.slice(0, 3).map((event, i) => (
                     <SwipeCard
