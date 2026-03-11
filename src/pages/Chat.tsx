@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Send, Users, Sparkles, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { ChatMessage } from "@/data/mockRooms";
+import { ArrowLeft, Users, Sparkles, Loader2 } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import MemberProfileSheet from "@/components/MemberProfileSheet";
+import MentionInput from "@/components/chat/MentionInput";
+import MessageBubble from "@/components/chat/MessageBubble";
 import { supabase } from "@/integrations/supabase/client";
 
 interface RoomMember {
@@ -13,6 +12,15 @@ interface RoomMember {
   name: string;
   avatar_url: string | null;
   interests: string[];
+}
+
+interface Message {
+  id: string;
+  user_id: string | null;
+  sender_name: string;
+  content: string;
+  is_ai: boolean;
+  created_at: string;
 }
 
 /** Generate an event-specific icebreaker message */
@@ -32,25 +40,46 @@ function getEventIcebreaker(eventTitle: string): string {
     return `Hey art lovers! Welcome to "${eventTitle}" 🎨 What kind of art are you into? Anyone been to this gallery before?`;
   if (lower.includes("game") || lower.includes("gaming") || lower.includes("board"))
     return `Welcome to "${eventTitle}"! 🎮 What games are you into right now? Let's get to know each other before we meet up!`;
+  if (lower.includes("salsa") || lower.includes("dance"))
+    return `Welcome to "${eventTitle}"! 💃 Who's ready to hit the dance floor? Any experienced dancers here or are we all beginners?`;
+  if (lower.includes("movie") || lower.includes("film") || lower.includes("cinema"))
+    return `Welcome to "${eventTitle}"! 🎬 What's the last movie that blew your mind? Let's get to know each other's taste!`;
   return `Welcome to the "${eventTitle}" room! 🔥 I'm Rekindled AI — here to help you all connect before the event. What are you most excited about for this one?`;
 }
 
 const Chat = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
   const [roomTitle, setRoomTitle] = useState("");
   const [members, setMembers] = useState<RoomMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserName, setCurrentUserName] = useState("You");
   const [selectedMember, setSelectedMember] = useState<RoomMember | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+
+  // Load room data + existing messages
   useEffect(() => {
     if (!roomId) return;
 
-    const fetchRoomData = async () => {
+    const fetchAll = async () => {
       setLoading(true);
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate("/"); return; }
+      setCurrentUserId(user.id);
+      setCurrentUserName(user.user_metadata?.name || "You");
 
       // Get room info
       const { data: room } = await supabase
@@ -59,27 +88,36 @@ const Chat = () => {
         .eq("id", roomId)
         .maybeSingle();
 
-      if (!room) {
-        navigate("/rooms");
-        return;
-      }
-
+      if (!room) { navigate("/rooms"); return; }
       const title = room.event_title || "Chat Room";
       setRoomTitle(title);
 
-      // Generate AI icebreaker based on the event
-      const icebreaker: ChatMessage = {
-        id: "ai-intro",
-        senderId: "ai",
-        senderName: "Rekindled AI",
-        senderAvatar: "",
-        content: getEventIcebreaker(title),
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        isAI: true,
-      };
-      setMessages([icebreaker]);
+      // Load existing messages
+      const { data: existingMessages } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: true });
 
-      // Get members with profiles
+      if (existingMessages && existingMessages.length > 0) {
+        setMessages(existingMessages);
+      } else {
+        // No messages yet — seed the AI icebreaker
+        const { data: aiMsg } = await supabase
+          .from("messages")
+          .insert({
+            room_id: roomId,
+            user_id: user.id,
+            sender_name: "Rekindled AI",
+            content: getEventIcebreaker(title),
+            is_ai: true,
+          })
+          .select()
+          .single();
+        if (aiMsg) setMessages([aiMsg]);
+      }
+
+      // Get members
       const { data: roomMembers } = await supabase
         .from("room_users")
         .select("user_id")
@@ -92,7 +130,6 @@ const Chat = () => {
           supabase.from("user_interests").select("user_id, interest_id").in("user_id", userIds),
         ]);
 
-        // Group interests by user_id
         const interestMap: Record<string, string[]> = {};
         for (const i of interests || []) {
           if (!interestMap[i.user_id]) interestMap[i.user_id] = [];
@@ -112,22 +149,74 @@ const Chat = () => {
       setLoading(false);
     };
 
-    fetchRoomData();
+    fetchAll();
   }, [roomId, navigate]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const newMsg: ChatMessage = {
-      id: `m${Date.now()}`,
-      senderId: "me",
-      senderName: "You",
-      senderAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Me",
-      content: input,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  // Realtime subscription
+  useEffect(() => {
+    if (!roomId) return;
+
+    const channel = supabase
+      .channel(`room-messages-${roomId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `room_id=eq.${roomId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as Message;
+          setMessages((prev) => {
+            // Avoid duplicates
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
-    setMessages((prev) => [...prev, newMsg]);
-    setInput("");
+  }, [roomId]);
+
+  const handleSend = async (text: string) => {
+    if (!roomId || !currentUserId) return;
+
+    // Insert into DB (realtime will add it to the list)
+    const { data: newMsg } = await supabase
+      .from("messages")
+      .insert({
+        room_id: roomId,
+        user_id: currentUserId,
+        sender_name: currentUserName,
+        content: text,
+        is_ai: false,
+      })
+      .select()
+      .single();
+
+    // If someone @mentioned Rekindled AI, generate a response
+    if (text.toLowerCase().includes("@rekindled ai")) {
+      const aiResponse = generateAIResponse(text, roomTitle);
+      await supabase.from("messages").insert({
+        room_id: roomId,
+        user_id: currentUserId,
+        sender_name: "Rekindled AI",
+        content: aiResponse,
+        is_ai: true,
+      });
+    }
   };
+
+  const mentionOptions = [
+    { id: "ai", name: "Rekindled AI", isAI: true },
+    ...members
+      .filter((m) => m.id !== currentUserId)
+      .map((m) => ({ id: m.id, name: m.name })),
+  ];
 
   const handleMemberClick = (member: RoomMember) => {
     setSelectedMember(member);
@@ -194,75 +283,28 @@ const Chat = () => {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 lg:px-8">
           <div className="mx-auto max-w-2xl space-y-6">
-            {messages.map((msg, i) => {
-              const isMe = msg.senderId === "me";
-              const isAI = msg.isAI;
-
-              return (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03, duration: 0.3 }}
-                  className={`flex gap-3 ${isMe ? "flex-row-reverse" : "flex-row"}`}
-                >
-                  {!isMe && (
-                    <div className="flex-shrink-0 pt-5">
-                      {isAI ? (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
-                          <Sparkles className="h-4 w-4 text-accent" />
-                        </div>
-                      ) : (
-                        <img src={msg.senderAvatar} alt={msg.senderName} className="h-8 w-8 rounded-full bg-secondary" />
-                      )}
-                    </div>
-                  )}
-                  <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"}`}>
-                    {!isMe && (
-                      <span className={`mb-1 block text-[11px] font-medium ${isAI ? "text-accent" : "text-muted-foreground"}`}>
-                        {msg.senderName}
-                      </span>
-                    )}
-                    <div
-                      className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                        isMe
-                          ? "bg-foreground text-primary-foreground rounded-br-md"
-                          : isAI
-                          ? "bg-accent/8 text-foreground border border-accent/15 rounded-bl-md"
-                          : "bg-card border border-border text-foreground rounded-bl-md"
-                      }`}
-                    >
-                      {msg.content}
-                    </div>
-                    <span className="mt-1.5 block text-[10px] text-muted-foreground">{msg.timestamp}</span>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {messages.map((msg, i) => (
+              <MessageBubble
+                key={msg.id}
+                senderName={msg.sender_name}
+                content={msg.content}
+                isMe={msg.user_id === currentUserId && !msg.is_ai}
+                isAI={msg.is_ai}
+                timestamp={new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                index={i}
+              />
+            ))}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
         {/* Input */}
         <div className="border-t border-border bg-card/80 backdrop-blur-xl px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:px-8">
-          <div className="mx-auto flex max-w-2xl items-center gap-3">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Type a message..."
-              className="flex-1 rounded-full border-border bg-secondary/50 text-foreground placeholder:text-muted-foreground h-12 px-5"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-foreground text-primary-foreground transition-all hover:opacity-90 active:scale-95 disabled:opacity-30"
-            >
-              <Send className="h-4 w-4" />
-            </button>
+          <div className="mx-auto max-w-2xl">
+            <MentionInput options={mentionOptions} onSend={handleSend} />
           </div>
         </div>
 
-        {/* Member profile sheet */}
         <MemberProfileSheet
           member={selectedMember}
           open={sheetOpen}
@@ -272,5 +314,21 @@ const Chat = () => {
     </AppShell>
   );
 };
+
+/** Generate a contextual AI response when @mentioned */
+function generateAIResponse(userMessage: string, eventTitle: string): string {
+  const lower = userMessage.toLowerCase();
+  if (lower.includes("recommend") || lower.includes("suggestion"))
+    return `Great question! For "${eventTitle}", I'd suggest arriving a bit early to get the best spot and chat with others. Don't be shy — everyone here is looking to connect! 🙌`;
+  if (lower.includes("who") || lower.includes("introduce"))
+    return `I'd love to help with introductions! Why don't everyone share one fun fact about themselves? I'll start: I'm an AI who never sleeps and loves connecting people! 🤖✨`;
+  if (lower.includes("excited") || lower.includes("can't wait"))
+    return `The energy in this room is amazing! 🔥 "${eventTitle}" is going to be incredible. What's everyone planning to wear?`;
+  if (lower.includes("help") || lower.includes("what can you do"))
+    return `I can help break the ice, suggest conversation topics, and make sure everyone feels welcome! Just @ me anytime. Try asking me to suggest a fun icebreaker! 😊`;
+  if (lower.includes("icebreaker") || lower.includes("ice breaker"))
+    return `Here's a fun one: If you could have dinner with any person (alive or dead), who would it be and why? Go! 🍽️✨`;
+  return `Thanks for tagging me! I'm here to help make "${eventTitle}" even more fun. Anyone else have thoughts? Let's keep the conversation going! 🎉`;
+}
 
 export default Chat;
