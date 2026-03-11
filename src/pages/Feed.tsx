@@ -1,9 +1,25 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import AppShell from "@/components/AppShell";
 import { MOCK_EVENTS } from "@/data/mockEvents";
 import { Flame, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
+
+/** Map event tag → interest id for matching */
+const TAG_TO_INTEREST: Record<string, string> = {
+  "Music": "music", "Live": "music",
+  "Tech": "tech", "Coding": "tech", "Competition": "tech",
+  "Networking": "networking", "Startups": "startups",
+  "Food": "food", "Festival": "food", "Brunch": "food",
+  "Fitness": "fitness", "Outdoors": "outdoors",
+  "Wellness": "fitness",
+  "Art": "art", "Culture": "art",
+  "Comedy": "comedy", "Entertainment": "comedy",
+  "Night Out": "dance", "Dance": "dance",
+  "Social": "networking",
+  "Games": "gaming", "Casual": "gaming",
+  "Film": "movies", "Chill": "outdoors",
+};
 import { toast } from "sonner";
 import {
   DropdownMenu,
