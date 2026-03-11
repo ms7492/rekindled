@@ -112,13 +112,16 @@ const Feed = () => {
         .from("swipes")
         .insert({ user_id: user.id, event_id: id, direction: "right" });
 
-      if (error) {
-        if (error.code === "23505") {
-          toast.info("You already joined this hang!");
-        } else {
-          toast.error("Something went wrong");
-        }
+      if (error && error.code !== "23505") {
+        toast.error("Something went wrong");
         return;
+      }
+
+      if (error?.code === "23505") {
+        toast.info("You already joined this hang!");
+      } else {
+        toast.success(`You're in for "${event.title}" ✦`);
+      }
       }
 
       toast.success(`You're in for "${event.title}" ✦`);
