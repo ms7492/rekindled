@@ -1,10 +1,11 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import EventCard from "@/components/EventCard";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { AnimatePresence, motion, animate } from "framer-motion";
+import SwipeCard from "@/components/SwipeCard";
 import AppShell from "@/components/AppShell";
 import { MOCK_EVENTS } from "@/data/mockEvents";
 import { supabase } from "@/integrations/supabase/client";
-import { Flame, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
+import { Flame, X, Heart } from "lucide-react";
+import { toast } from "sonner";
 
 /** Map event tag → interest id for matching */
 const TAG_TO_INTEREST: Record<string, string> = {
@@ -21,26 +22,8 @@ const TAG_TO_INTEREST: Record<string, string> = {
   "Games": "gaming", "Casual": "gaming",
   "Film": "movies", "Chill": "outdoors",
 };
-import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-
-const CATEGORIES = [
-  { value: "all", label: "All Categories", emoji: "🔥" },
-  { value: "music", label: "Music", emoji: "🎵" },
-  { value: "food", label: "Food & Drinks", emoji: "🍕" },
-  { value: "tech", label: "Tech", emoji: "💻" },
-  { value: "wellness", label: "Wellness", emoji: "🧘" },
-  { value: "art", label: "Art & Culture", emoji: "🎨" },
-];
 
 const Feed = () => {
-  // Read user interests from localStorage and sort events by relevance
   const userInterests: string[] = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("rekindle_interests") || "[]");
@@ -61,12 +44,10 @@ const Feed = () => {
 
   const [swipeCounts, setSwipeCounts] = useState<Record<string, number>>({});
   const [events, setEvents] = useState(sortedEvents);
-  const [activeCategory, setActiveCategory] = useState("all");
 
   // Fetch swipe counts AND filter out events user already swiped on
   useEffect(() => {
     const fetchData = async () => {
-      // Get counts for all events
       const { data: allSwipes } = await supabase
         .from("swipes")
         .select("event_id")
@@ -78,7 +59,6 @@ const Feed = () => {
       }
       setSwipeCounts(counts);
 
-      // Filter out events user already swiped on
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: userSwipes } = await supabase
@@ -93,59 +73,55 @@ const Feed = () => {
     fetchData();
   }, []);
 
-  const activeCat = CATEGORIES.find((c) => c.value === activeCategory) || CATEGORIES[0];
-
-  const handleJoin = useCallback(
-    async (id: string) => {
-      const event = events.find((e) => e.id === id);
+  const handleSwipe = useCallback(
+    async (direction: "left" | "right") => {
+      const event = events[0];
       if (!event) return;
 
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error("Please sign in first");
         return;
       }
 
-      // Insert right swipe
+      // Insert swipe
       const { error } = await supabase
         .from("swipes")
-        .insert({ user_id: user.id, event_id: id, direction: "right" });
+        .insert({ user_id: user.id, event_id: event.id, direction });
 
       if (error && error.code !== "23505") {
         toast.error("Something went wrong");
         return;
       }
 
-      if (error?.code === "23505") {
-        toast.info("You already joined this hang!");
-      } else {
-        toast.success(`You're in for "${event.title}" ✦`);
-        setSwipeCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+      if (direction === "right") {
+        if (error?.code === "23505") {
+          toast.info("You already liked this!");
+        } else {
+          toast.success(`You're interested in "${event.title}" ❤️`);
+          setSwipeCounts((prev) => ({ ...prev, [event.id]: (prev[event.id] || 0) + 1 }));
+        }
+        // Trigger matchmaking
+        supabase.functions.invoke("matchmaking", {
+          body: { event_titles: { [event.id]: event.title } },
+        }).catch(() => {});
       }
 
-      // Always remove the card and trigger matchmaking
-      setEvents((prev) => prev.filter((e) => e.id !== id));
-      supabase.functions.invoke("matchmaking", {
-        body: { event_titles: { [id]: event.title } },
-      }).catch(() => {});
+      // Remove card
+      setEvents((prev) => prev.slice(1));
     },
     [events]
   );
 
-  const handlePass = useCallback(
-    async (id: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from("swipes")
-          .insert({ user_id: user.id, event_id: id, direction: "left" })
-          .then(() => {});
-      }
-      setEvents((prev) => prev.filter((e) => e.id !== id));
+  // Button-triggered swipes with animation
+  const triggerSwipe = useCallback(
+    (direction: "left" | "right") => {
+      handleSwipe(direction);
     },
-    []
+    [handleSwipe]
   );
+
+  const currentEvent = events[0];
 
   return (
     <AppShell>
@@ -154,105 +130,73 @@ const Feed = () => {
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-40 right-0 h-[600px] w-[600px] rounded-full bg-accent/[0.06] blur-[120px]" />
           <div className="absolute bottom-0 -left-40 h-[500px] w-[500px] rounded-full bg-accent/[0.04] blur-[100px]" />
-          <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(hsl(var(--foreground)) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
         </div>
 
-        {/* Scrollable content */}
-        <div className="relative z-10 flex-1 overflow-y-auto">
-          {/* Header */}
-          <div className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-xl">
-            <div className="mx-auto max-w-5xl px-6 py-4 lg:px-8">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent/10">
-                    <Flame className="h-4.5 w-4.5 text-accent" />
-                  </div>
-                  <div>
-                    <h1 className="font-display text-lg font-bold lg:text-xl">Discover</h1>
-                    <p className="text-[11px] text-muted-foreground">{events.length} hangs near you</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {/* Category dropdown */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="rounded-xl border-border gap-2 text-sm font-medium"
-                        size="sm"
-                      >
-                        <span>{activeCat.emoji}</span>
-                        <span className="hidden sm:inline">{activeCat.label}</span>
-                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      {CATEGORIES.map((cat) => (
-                        <DropdownMenuItem
-                          key={cat.value}
-                          onClick={() => setActiveCategory(cat.value)}
-                          className="flex items-center justify-between gap-2"
-                        >
-                          <span className="flex items-center gap-2">
-                            <span>{cat.emoji}</span>
-                            {cat.label}
-                          </span>
-                          {activeCategory === cat.value && (
-                            <Check className="h-3.5 w-3.5 text-accent" />
-                          )}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-xl border-border"
-                  >
-                    <SlidersHorizontal className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
+        {/* Header */}
+        <div className="relative z-20 border-b border-border bg-background/80 backdrop-blur-xl">
+          <div className="mx-auto max-w-lg px-6 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent/10">
+                <Flame className="h-4 w-4 text-accent" />
+              </div>
+              <div>
+                <h1 className="font-display text-lg font-bold">Discover</h1>
+                <p className="text-[11px] text-muted-foreground">{events.length} events near you</p>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Events grid */}
-          <div className="mx-auto max-w-5xl px-6 py-6 lg:px-8 lg:py-8">
-            <AnimatePresence mode="popLayout">
-              {events.length > 0 ? (
-                <motion.div
-                  layout
-                  className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-                >
-                  {events.map((event, i) => (
-                    <EventCard
+        {/* Card deck area */}
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-4">
+          {events.length > 0 ? (
+            <>
+              {/* Card container */}
+              <div className="relative w-full max-w-[380px] aspect-[3/4.5] sm:aspect-[3/4.2]">
+                <AnimatePresence>
+                  {events.slice(0, 3).map((event, i) => (
+                    <SwipeCard
                       key={event.id}
-                      event={{ ...event, attendees: swipeCounts[event.id] || 0 }}
-                      onJoin={handleJoin}
-                      onPass={handlePass}
+                      event={{ ...event, attendees: swipeCounts[event.id] || event.attendees }}
+                      onSwipe={handleSwipe}
+                      isTop={i === 0}
                       index={i}
                     />
                   ))}
-                </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center justify-center py-32 text-center"
+                </AnimatePresence>
+              </div>
+
+              {/* Action buttons */}
+              <div className="mt-6 flex items-center gap-6">
+                <button
+                  onClick={() => triggerSwipe("left")}
+                  className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-red-400/30 bg-card shadow-card transition-all hover:scale-110 hover:border-red-400/60 hover:shadow-elevated active:scale-95"
                 >
-                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-secondary">
-                    <Flame className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h2 className="mb-2 font-display text-2xl font-bold">All caught up!</h2>
-                  <p className="text-muted-foreground max-w-sm">
-                    You've seen all available hangs. Check back later for more.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  <X className="h-7 w-7 text-red-400" />
+                </button>
+                <button
+                  onClick={() => triggerSwipe("right")}
+                  className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-green-400/30 bg-accent shadow-card transition-all hover:scale-110 hover:border-green-400/60 hover:shadow-elevated active:scale-95"
+                >
+                  <Heart className="h-9 w-9 text-white" fill="white" />
+                </button>
+              </div>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center text-center px-6"
+            >
+              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-secondary">
+                <Flame className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <h2 className="mb-2 font-display text-2xl font-bold">No more events right now</h2>
+              <p className="text-muted-foreground max-w-sm">
+                Check back later for more events near you!
+              </p>
+            </motion.div>
+          )}
         </div>
       </div>
     </AppShell>
