@@ -1,8 +1,9 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import AppShell from "@/components/AppShell";
 import { MOCK_EVENTS } from "@/data/mockEvents";
+import { supabase } from "@/integrations/supabase/client";
 import { Flame, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
 
 /** Map event tag → interest id for matching */
@@ -58,8 +59,26 @@ const Feed = () => {
     });
   }, [userInterests]);
 
+  const [swipeCounts, setSwipeCounts] = useState<Record<string, number>>({});
   const [events, setEvents] = useState(sortedEvents);
   const [activeCategory, setActiveCategory] = useState("all");
+
+  // Fetch real right-swipe counts from the database
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const { data, error } = await supabase
+        .from("swipes")
+        .select("event_id")
+        .eq("direction", "right");
+      if (error || !data) return;
+      const counts: Record<string, number> = {};
+      for (const row of data) {
+        counts[row.event_id] = (counts[row.event_id] || 0) + 1;
+      }
+      setSwipeCounts(counts);
+    };
+    fetchCounts();
+  }, []);
 
   const activeCat = CATEGORIES.find((c) => c.value === activeCategory) || CATEGORIES[0];
 
@@ -163,7 +182,7 @@ const Feed = () => {
                   {events.map((event, i) => (
                     <EventCard
                       key={event.id}
-                      event={event}
+                      event={{ ...event, attendees: swipeCounts[event.id] || 0 }}
                       onJoin={handleJoin}
                       onPass={handlePass}
                       index={i}
