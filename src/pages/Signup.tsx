@@ -76,7 +76,6 @@ const Signup = () => {
     method: isLogin ? "Welcome back" : "Let's get you started",
     "email-input": isLogin ? "Sign in to your account" : "Create your account",
     "phone-input": "Enter your phone number",
-    otp: "Enter the code we sent",
   };
 
   const avatarPicker = (
