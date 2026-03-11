@@ -44,7 +44,20 @@ const Chat = () => {
         return;
       }
 
-      setRoomTitle(room.event_title || "Chat Room");
+      const title = room.event_title || "Chat Room";
+      setRoomTitle(title);
+
+      // Generate AI icebreaker based on the event
+      const icebreaker: ChatMessage = {
+        id: "ai-intro",
+        senderId: "ai",
+        senderName: "Rekindled AI",
+        senderAvatar: "",
+        content: getEventIcebreaker(title),
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        isAI: true,
+      };
+      setMessages([icebreaker]);
 
       // Get members with profiles
       const { data: roomMembers } = await supabase
