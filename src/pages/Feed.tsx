@@ -126,7 +126,9 @@ const Feed = () => {
 
       // Always remove the card and trigger matchmaking
       setEvents((prev) => prev.filter((e) => e.id !== id));
-      supabase.functions.invoke("matchmaking").catch(() => {});
+      supabase.functions.invoke("matchmaking", {
+        body: { event_titles: { [id]: event.title } },
+      }).catch(() => {});
     },
     [events]
   );
