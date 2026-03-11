@@ -1,9 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppShell from "@/components/AppShell";
-import { MOCK_ROOMS } from "@/data/mockRooms";
-import { MessageCircle, Search, Sparkles, Users } from "lucide-react";
-import { useState } from "react";
+import { MessageCircle, Search, Sparkles, Users, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface RoomData {
+  id: string;
+  event_id: string;
+  event_title: string | null;
+  created_at: string;
+  member_count: number;
+}
 
 const FILTERS = ["All", "Active", "New", "Archived"];
 
@@ -11,6 +19,76 @@ const Rooms = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [rooms, setRooms] = useState<RoomData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserRooms = async () => {
+      setLoading(true);
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      // Get events the user swiped right on
+      const { data: swipes } = await supabase
+        .from("swipes")
+        .select("event_id")
+        .eq("user_id", user.id)
+        .eq("direction", "right");
+
+      if (!swipes || swipes.length === 0) {
+        setRooms([]);
+        setLoading(false);
+        return;
+      }
+
+      const likedEventIds = swipes.map((s) => s.event_id);
+
+      // Get rooms for those events
+      const { data: roomData } = await supabase
+        .from("rooms")
+        .select("id, event_id, event_title, created_at")
+        .in("event_id", likedEventIds);
+
+      if (!roomData || roomData.length === 0) {
+        setRooms([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get member counts per room
+      const roomIds = roomData.map((r) => r.id);
+      const { data: members } = await supabase
+        .from("room_users")
+        .select("room_id")
+        .in("room_id", roomIds);
+
+      const countMap: Record<string, number> = {};
+      for (const m of members || []) {
+        countMap[m.room_id] = (countMap[m.room_id] || 0) + 1;
+      }
+
+      setRooms(
+        roomData.map((r) => ({
+          ...r,
+          member_count: countMap[r.id] || 0,
+        }))
+      );
+      setLoading(false);
+    };
+
+    fetchUserRooms();
+  }, []);
+
+  const filteredRooms = rooms.filter((r) =>
+    searchQuery
+      ? (r.event_title || "").toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  );
 
   return (
     <AppShell>
@@ -21,13 +99,8 @@ const Rooms = () => {
             <div>
               <h1 className="font-display text-xl font-bold lg:text-2xl">Chats</h1>
               <p className="mt-0.5 text-sm text-muted-foreground">
-                {MOCK_ROOMS.length} active conversations
+                {rooms.length} conversation{rooms.length !== 1 ? "s" : ""}
               </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-accent px-2 text-[11px] font-bold text-accent-foreground">
-                {MOCK_ROOMS.reduce((sum, r) => sum + r.unread, 0)}
-              </span>
             </div>
           </div>
 
@@ -62,19 +135,21 @@ const Rooms = () => {
         </div>
 
         <div className="flex flex-1">
-          {/* Chat list */}
           <div className="flex-1 overflow-y-auto px-6 pb-24 lg:pb-8 lg:px-8">
-            {MOCK_ROOMS.length > 0 ? (
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-28">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : filteredRooms.length > 0 ? (
               <div className="mx-auto max-w-2xl">
-                {/* Pinned section */}
                 <div className="py-3">
                   <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                    Recent
+                    Your Rooms
                   </p>
                 </div>
 
                 <div className="divide-y divide-border">
-                  {MOCK_ROOMS.map((room, i) => (
+                  {filteredRooms.map((room, i) => (
                     <motion.button
                       key={room.id}
                       initial={{ opacity: 0, y: 12 }}
@@ -83,65 +158,24 @@ const Rooms = () => {
                       onClick={() => navigate(`/chat/${room.id}`)}
                       className="flex w-full items-center gap-4 py-4 text-left transition-all hover:bg-secondary/30 -mx-3 px-3 rounded-xl"
                     >
-                      <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center">
-                        {room.members.slice(0, 3).map((m, j) => (
-                          <img
-                            key={m.id}
-                            src={m.avatar}
-                            alt={m.name}
-                            className="absolute h-8 w-8 rounded-full border-2 border-background bg-secondary"
-                            style={{ left: j * 10, top: j * 3, zIndex: 3 - j }}
-                          />
-                        ))}
+                      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-accent/10">
+                        <Sparkles className="h-6 w-6 text-accent" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-foreground text-[15px] truncate">{room.eventTitle}</h3>
-                          <span className="text-[11px] text-muted-foreground flex-shrink-0 ml-2">{room.lastMessageTime}</span>
+                          <h3 className="font-semibold text-foreground text-[15px] truncate">
+                            {room.event_title || `Event ${room.event_id}`}
+                          </h3>
                         </div>
-                        <div className="flex items-center gap-1.5 mb-1">
+                        <div className="flex items-center gap-1.5">
                           <Users className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-[11px] text-muted-foreground">{room.members.length} members · {room.eventDate}</span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {room.member_count} member{room.member_count !== 1 ? "s" : ""}
+                          </span>
                         </div>
-                        <p className="text-sm text-muted-foreground truncate">{room.lastMessage}</p>
                       </div>
-                      {room.unread > 0 && (
-                        <span className="flex h-6 min-w-[24px] flex-shrink-0 items-center justify-center rounded-full bg-accent px-2 text-[11px] font-bold text-accent-foreground">
-                          {room.unread}
-                        </span>
-                      )}
                     </motion.button>
                   ))}
-                </div>
-
-                {/* Suggested section */}
-                <div className="py-5 mt-4">
-                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground flex items-center gap-2">
-                    <Sparkles className="h-3 w-3" />
-                    Suggested hangs to join
-                  </p>
-                  <div className="space-y-2">
-                    {[
-                      { title: "Sunset Yoga in the Park", members: 4, emoji: "🧘" },
-                      { title: "Street Food Festival", members: 6, emoji: "🍕" },
-                    ].map((suggestion) => (
-                      <div
-                        key={suggestion.title}
-                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-3.5 transition-all hover:bg-secondary/30 cursor-pointer"
-                      >
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-lg">
-                          {suggestion.emoji}
-                        </span>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">{suggestion.title}</p>
-                          <p className="text-[11px] text-muted-foreground">{suggestion.members} people interested</p>
-                        </div>
-                        <span className="rounded-full bg-accent/10 px-3 py-1 text-[11px] font-semibold text-accent">
-                          Join
-                        </span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             ) : (
