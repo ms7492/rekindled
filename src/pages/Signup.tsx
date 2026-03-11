@@ -7,7 +7,7 @@ import { ArrowRight, ArrowLeft, Camera, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type Step = "method" | "phone-input" | "otp" | "email-input";
+type Step = "method" | "phone-input" | "email-input";
 
 const fade = {
   initial: { opacity: 0, x: 20 },
