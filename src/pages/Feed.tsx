@@ -167,7 +167,7 @@ const Feed = () => {
               </div>
 
               {/* Action buttons */}
-              <div className="mt-6 flex items-center gap-6">
+              <div className="mt-4 flex items-center gap-6">
                 <button
                   onClick={() => triggerSwipe("left")}
                   className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-red-400/30 bg-card shadow-card transition-all hover:scale-110 hover:border-red-400/60 hover:shadow-elevated active:scale-95"
