@@ -214,25 +214,6 @@ const Signup = () => {
             </motion.div>
           )}
 
-          {step === "info" && (
-            <motion.div key="info" {...fade} className="w-full space-y-5">
-              {avatarPicker}
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground/70">Name</label>
-                <Input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground/70">Email</label>
-                <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
-              </div>
-              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleInfoContinue}>
-                Continue <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-              <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="h-3.5 w-3.5" /> Back
-              </button>
-            </motion.div>
-          )}
 
           {step === "phone-input" && (
             <motion.div key="phone" {...fade} className="w-full space-y-5">
