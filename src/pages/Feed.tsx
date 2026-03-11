@@ -1,9 +1,25 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import AppShell from "@/components/AppShell";
 import { MOCK_EVENTS } from "@/data/mockEvents";
 import { Flame, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
+
+/** Map event tag → interest id for matching */
+const TAG_TO_INTEREST: Record<string, string> = {
+  "Music": "music", "Live": "music",
+  "Tech": "tech", "Coding": "tech", "Competition": "tech",
+  "Networking": "networking", "Startups": "startups",
+  "Food": "food", "Festival": "food", "Brunch": "food",
+  "Fitness": "fitness", "Outdoors": "outdoors",
+  "Wellness": "fitness",
+  "Art": "art", "Culture": "art",
+  "Comedy": "comedy", "Entertainment": "comedy",
+  "Night Out": "dance", "Dance": "dance",
+  "Social": "networking",
+  "Games": "gaming", "Casual": "gaming",
+  "Film": "movies", "Chill": "outdoors",
+};
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -23,7 +39,26 @@ const CATEGORIES = [
 ];
 
 const Feed = () => {
-  const [events, setEvents] = useState(MOCK_EVENTS);
+  // Read user interests from localStorage and sort events by relevance
+  const userInterests: string[] = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("rekindle_interests") || "[]");
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const sortedEvents = useMemo(() => {
+    if (userInterests.length === 0) return MOCK_EVENTS;
+    const interestSet = new Set(userInterests);
+    return [...MOCK_EVENTS].sort((a, b) => {
+      const scoreA = a.tags.filter((t) => interestSet.has(TAG_TO_INTEREST[t] || t.toLowerCase())).length;
+      const scoreB = b.tags.filter((t) => interestSet.has(TAG_TO_INTEREST[t] || t.toLowerCase())).length;
+      return scoreB - scoreA;
+    });
+  }, [userInterests]);
+
+  const [events, setEvents] = useState(sortedEvents);
   const [activeCategory, setActiveCategory] = useState("all");
 
   const activeCat = CATEGORIES.find((c) => c.value === activeCategory) || CATEGORIES[0];
