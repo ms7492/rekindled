@@ -316,20 +316,4 @@ const Chat = () => {
   );
 };
 
-/** Generate a contextual AI response when @mentioned */
-function generateAIResponse(userMessage: string, eventTitle: string): string {
-  const lower = userMessage.toLowerCase();
-  if (lower.includes("recommend") || lower.includes("suggestion"))
-    return `Great question! For "${eventTitle}", I'd suggest arriving a bit early to get the best spot and chat with others. Don't be shy — everyone here is looking to connect! 🙌`;
-  if (lower.includes("who") || lower.includes("introduce"))
-    return `I'd love to help with introductions! Why don't everyone share one fun fact about themselves? I'll start: I'm an AI who never sleeps and loves connecting people! 🤖✨`;
-  if (lower.includes("excited") || lower.includes("can't wait"))
-    return `The energy in this room is amazing! 🔥 "${eventTitle}" is going to be incredible. What's everyone planning to wear?`;
-  if (lower.includes("help") || lower.includes("what can you do"))
-    return `I can help break the ice, suggest conversation topics, and make sure everyone feels welcome! Just @ me anytime. Try asking me to suggest a fun icebreaker! 😊`;
-  if (lower.includes("icebreaker") || lower.includes("ice breaker"))
-    return `Here's a fun one: If you could have dinner with any person (alive or dead), who would it be and why? Go! 🍽️✨`;
-  return `Thanks for tagging me! I'm here to help make "${eventTitle}" even more fun. Anyone else have thoughts? Let's keep the conversation going! 🎉`;
-}
-
 export default Chat;
