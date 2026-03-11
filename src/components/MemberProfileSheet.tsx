@@ -20,11 +20,20 @@ interface MemberProfileSheetProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const INTEREST_LABELS: Record<string, string> = {
+  music: "Music", sports: "Sports", tech: "Tech", food: "Food & Drinks",
+  art: "Art & Design", fitness: "Fitness", gaming: "Gaming", movies: "Movies & TV",
+  travel: "Travel", reading: "Reading", photography: "Photography",
+  networking: "Networking", dance: "Dance", outdoors: "Outdoors",
+  comedy: "Comedy", volunteering: "Volunteering", startups: "Startups", cooking: "Cooking",
+};
+
 const INTEREST_EMOJIS: Record<string, string> = {
-  Music: "🎵", Tech: "💻", Food: "🍕", Fitness: "💪",
-  Art: "🎨", Comedy: "😂", Dance: "💃", Gaming: "🎮",
-  Outdoors: "🌿", Networking: "🤝", Startups: "🚀",
-  Movies: "🎬", Photography: "📸", Wellness: "🧘",
+  music: "🎵", sports: "⚽", tech: "💻", food: "🍕", fitness: "💪",
+  art: "🎨", comedy: "😂", dance: "💃", gaming: "🎮",
+  outdoors: "🌿", networking: "🤝", startups: "🚀",
+  movies: "🎬", photography: "📸", travel: "✈️", reading: "📚",
+  volunteering: "❤️", cooking: "👨‍🍳",
 };
 
 const MemberProfileSheet = ({ member, open, onOpenChange }: MemberProfileSheetProps) => {
@@ -71,7 +80,7 @@ const MemberProfileSheet = ({ member, open, onOpenChange }: MemberProfileSheetPr
                     className="flex items-center gap-1.5 rounded-full border border-border/50 bg-card/50 px-3.5 py-2 text-sm font-medium text-foreground"
                   >
                     <span>{INTEREST_EMOJIS[interest] || "✨"}</span>
-                    {interest}
+                    {INTEREST_LABELS[interest] || interest}
                   </span>
                 ))}
               </div>

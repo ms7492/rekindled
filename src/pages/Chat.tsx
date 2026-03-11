@@ -54,17 +54,24 @@ const Chat = () => {
 
       if (roomMembers && roomMembers.length > 0) {
         const userIds = roomMembers.map((m) => m.user_id);
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("id, name, avatar_url")
-          .in("id", userIds);
+        const [{ data: profiles }, { data: interests }] = await Promise.all([
+          supabase.from("profiles").select("id, name, avatar_url").in("id", userIds),
+          supabase.from("user_interests").select("user_id, interest_id").in("user_id", userIds),
+        ]);
+
+        // Group interests by user_id
+        const interestMap: Record<string, string[]> = {};
+        for (const i of interests || []) {
+          if (!interestMap[i.user_id]) interestMap[i.user_id] = [];
+          interestMap[i.user_id].push(i.interest_id);
+        }
 
         setMembers(
           (profiles || []).map((p) => ({
             id: p.id,
             name: p.name || "Anonymous",
             avatar_url: p.avatar_url,
-            interests: [], // TODO: fetch from DB when interests table exists
+            interests: interestMap[p.id] || [],
           }))
         );
       }

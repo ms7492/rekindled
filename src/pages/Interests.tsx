@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const INTERESTS = [
   { id: "music", label: "Music", emoji: "🎵" },
@@ -36,12 +37,22 @@ const Interests = () => {
     );
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (selected.length < 3) {
       toast.error("Pick at least 3 interests");
       return;
     }
     localStorage.setItem("rekindle_interests", JSON.stringify(selected));
+
+    // Save interests to DB
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      // Clear existing and insert new
+      await supabase.from("user_interests").delete().eq("user_id", user.id);
+      const rows = selected.map((id) => ({ user_id: user.id, interest_id: id }));
+      await supabase.from("user_interests").insert(rows);
+    }
+
     navigate("/feed");
   };
 
