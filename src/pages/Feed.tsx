@@ -148,7 +148,7 @@ const Feed = () => {
         </div>
 
         {/* Card deck area */}
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-4">
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-3 py-3">
           {events.length > 0 ? (
             <>
               {/* Card container */}
