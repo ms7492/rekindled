@@ -7,7 +7,7 @@ import { ArrowRight, ArrowLeft, Camera, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type Step = "method" | "phone-input" | "otp" | "email-input";
+type Step = "method" | "phone-input" | "email-input";
 
 const fade = {
   initial: { opacity: 0, x: 20 },
@@ -63,49 +63,19 @@ const Signup = () => {
     } finally { setLoading(false); }
   };
 
-  const handleSendOtp = async () => {
-    const cleaned = phone.replace(/\s/g, "");
-    if (cleaned.length < 10 || !cleaned.startsWith("+")) {
-      toast.error("Enter a valid phone number with country code (e.g. +1...)");
+  const handlePhoneContinue = () => {
+    if (phone.trim().length < 7) {
+      toast.error("Please enter a valid phone number");
       return;
     }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({ phone: cleaned });
-      if (error) throw error;
-      setStep("otp");
-      toast.success("Verification code sent!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send code");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp.length < 6) { toast.error("Enter a 6-digit code"); return; }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: phone.replace(/\s/g, ""),
-        token: otp,
-        type: "sms",
-      });
-      if (error) throw error;
-      toast.success("Welcome to Rekindled!");
-      navigate("/interests");
-    } catch (err: any) {
-      toast.error(err.message || "Invalid code");
-    } finally {
-      setLoading(false);
-    }
+    toast.success("Welcome to Rekindled!");
+    navigate("/interests");
   };
 
   const subtitle: Record<Step, string> = {
     method: isLogin ? "Welcome back" : "Let's get you started",
     "email-input": isLogin ? "Sign in to your account" : "Create your account",
     "phone-input": "Enter your phone number",
-    otp: "Enter the code we sent",
   };
 
   const avatarPicker = (
@@ -221,29 +191,11 @@ const Signup = () => {
                 <label className="text-[13px] font-medium text-foreground/70">Phone Number</label>
                 <Input type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} />
               </div>
-              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleSendOtp}>
-                Send Code <ArrowRight className="ml-1.5 h-4 w-4" />
+              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handlePhoneContinue}>
+                Continue <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
               <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
-              </button>
-            </motion.div>
-          )}
-
-          {step === "otp" && (
-            <motion.div key="otp" {...fade} className="w-full space-y-5">
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground/70">Verification Code</label>
-                <Input
-                  type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6}
-                  className="h-14 rounded-xl border-border/50 bg-secondary/50 text-foreground text-center text-2xl tracking-[0.4em] placeholder:text-muted-foreground placeholder:tracking-[0.4em] placeholder:text-base focus-visible:ring-1 focus-visible:ring-foreground/30"
-                />
-              </div>
-              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleVerifyOtp}>
-                Verify & Enter <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-              <button onClick={() => setStep("phone-input")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="h-3.5 w-3.5" /> Change number
               </button>
             </motion.div>
           )}
