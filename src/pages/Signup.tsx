@@ -63,42 +63,13 @@ const Signup = () => {
     } finally { setLoading(false); }
   };
 
-  const handleSendOtp = async () => {
-    const cleaned = phone.replace(/\s/g, "");
-    if (cleaned.length < 10 || !cleaned.startsWith("+")) {
-      toast.error("Enter a valid phone number with country code (e.g. +1...)");
+  const handlePhoneContinue = () => {
+    if (phone.trim().length < 7) {
+      toast.error("Please enter a valid phone number");
       return;
     }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({ phone: cleaned });
-      if (error) throw error;
-      setStep("otp");
-      toast.success("Verification code sent!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send code");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp.length < 6) { toast.error("Enter a 6-digit code"); return; }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: phone.replace(/\s/g, ""),
-        token: otp,
-        type: "sms",
-      });
-      if (error) throw error;
-      toast.success("Welcome to Rekindled!");
-      navigate("/interests");
-    } catch (err: any) {
-      toast.error(err.message || "Invalid code");
-    } finally {
-      setLoading(false);
-    }
+    toast.success("Welcome to Rekindled!");
+    navigate("/interests");
   };
 
   const subtitle: Record<Step, string> = {
