@@ -38,8 +38,26 @@ const CATEGORIES = [
   { value: "art", label: "Art & Culture", emoji: "🎨" },
 ];
 
-const Feed = () => {
-  const [events, setEvents] = useState(MOCK_EVENTS);
+  // Read user interests from localStorage and sort events by relevance
+  const userInterests: string[] = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("rekindle_interests") || "[]");
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const sortedEvents = useMemo(() => {
+    if (userInterests.length === 0) return MOCK_EVENTS;
+    const interestSet = new Set(userInterests);
+    return [...MOCK_EVENTS].sort((a, b) => {
+      const scoreA = a.tags.filter((t) => interestSet.has(TAG_TO_INTEREST[t] || t.toLowerCase())).length;
+      const scoreB = b.tags.filter((t) => interestSet.has(TAG_TO_INTEREST[t] || t.toLowerCase())).length;
+      return scoreB - scoreA;
+    });
+  }, [userInterests]);
+
+  const [events, setEvents] = useState(sortedEvents);
   const [activeCategory, setActiveCategory] = useState("all");
 
   const activeCat = CATEGORIES.find((c) => c.value === activeCategory) || CATEGORIES[0];
