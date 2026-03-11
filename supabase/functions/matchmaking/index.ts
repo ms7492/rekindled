@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     try {
       const body = await req.json();
       eventTitles = body?.event_titles || {};
-    } catch { /* no body is fine */ }
+    } catch (_e) { /* no body is fine */ }
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
