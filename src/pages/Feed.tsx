@@ -121,14 +121,11 @@ const Feed = () => {
         toast.info("You already joined this hang!");
       } else {
         toast.success(`You're in for "${event.title}" ✦`);
-      }
+        setSwipeCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
       }
 
-      toast.success(`You're in for "${event.title}" ✦`);
+      // Always remove the card and trigger matchmaking
       setEvents((prev) => prev.filter((e) => e.id !== id));
-      setSwipeCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-
-      // Trigger matchmaking so room is created immediately if threshold met
       supabase.functions.invoke("matchmaking").catch(() => {});
     },
     [events]
