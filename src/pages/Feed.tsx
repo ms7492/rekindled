@@ -63,21 +63,34 @@ const Feed = () => {
   const [events, setEvents] = useState(sortedEvents);
   const [activeCategory, setActiveCategory] = useState("all");
 
-  // Fetch real right-swipe counts from the database
+  // Fetch swipe counts AND filter out events user already swiped on
   useEffect(() => {
-    const fetchCounts = async () => {
-      const { data, error } = await supabase
+    const fetchData = async () => {
+      // Get counts for all events
+      const { data: allSwipes } = await supabase
         .from("swipes")
         .select("event_id")
         .eq("direction", "right");
-      if (error || !data) return;
+
       const counts: Record<string, number> = {};
-      for (const row of data) {
+      for (const row of allSwipes || []) {
         counts[row.event_id] = (counts[row.event_id] || 0) + 1;
       }
       setSwipeCounts(counts);
+
+      // Filter out events user already swiped on
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: userSwipes } = await supabase
+          .from("swipes")
+          .select("event_id")
+          .eq("user_id", user.id);
+
+        const swipedIds = new Set((userSwipes || []).map((s) => s.event_id));
+        setEvents((prev) => prev.filter((e) => !swipedIds.has(e.id)));
+      }
     };
-    fetchCounts();
+    fetchData();
   }, []);
 
   const activeCat = CATEGORIES.find((c) => c.value === activeCategory) || CATEGORIES[0];
