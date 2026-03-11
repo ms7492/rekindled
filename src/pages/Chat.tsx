@@ -1,17 +1,79 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Send, Users, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, Users, Sparkles, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { MOCK_ROOMS, MOCK_CHAT, ChatMessage } from "@/data/mockRooms";
+import { MOCK_CHAT, ChatMessage } from "@/data/mockRooms";
 import AppShell from "@/components/AppShell";
+import MemberProfileSheet from "@/components/MemberProfileSheet";
+import { supabase } from "@/integrations/supabase/client";
+
+interface RoomMember {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  interests: string[];
+}
 
 const Chat = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const room = MOCK_ROOMS.find((r) => r.id === roomId);
   const [messages, setMessages] = useState<ChatMessage[]>(MOCK_CHAT);
   const [input, setInput] = useState("");
+  const [roomTitle, setRoomTitle] = useState("");
+  const [members, setMembers] = useState<RoomMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedMember, setSelectedMember] = useState<RoomMember | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  useEffect(() => {
+    if (!roomId) return;
+
+    const fetchRoomData = async () => {
+      setLoading(true);
+
+      // Get room info
+      const { data: room } = await supabase
+        .from("rooms")
+        .select("id, event_title")
+        .eq("id", roomId)
+        .maybeSingle();
+
+      if (!room) {
+        navigate("/rooms");
+        return;
+      }
+
+      setRoomTitle(room.event_title || "Chat Room");
+
+      // Get members with profiles
+      const { data: roomMembers } = await supabase
+        .from("room_users")
+        .select("user_id")
+        .eq("room_id", roomId);
+
+      if (roomMembers && roomMembers.length > 0) {
+        const userIds = roomMembers.map((m) => m.user_id);
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, name, avatar_url")
+          .in("id", userIds);
+
+        setMembers(
+          (profiles || []).map((p) => ({
+            id: p.id,
+            name: p.name || "Anonymous",
+            avatar_url: p.avatar_url,
+            interests: [], // TODO: fetch from DB when interests table exists
+          }))
+        );
+      }
+
+      setLoading(false);
+    };
+
+    fetchRoomData();
+  }, [roomId, navigate]);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -27,7 +89,20 @@ const Chat = () => {
     setInput("");
   };
 
-  if (!room) { navigate("/rooms"); return null; }
+  const handleMemberClick = (member: RoomMember) => {
+    setSelectedMember(member);
+    setSheetOpen(true);
+  };
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="flex flex-1 items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -38,11 +113,41 @@ const Chat = () => {
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
           <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-[15px] text-foreground truncate">{room.eventTitle}</h2>
+            <h2 className="font-semibold text-[15px] text-foreground truncate">{roomTitle}</h2>
             <span className="text-[11px] text-muted-foreground flex items-center gap-1">
               <Users className="h-3 w-3" />
-              {room.members.length} members · {room.eventDate}
+              {members.length} members
             </span>
+          </div>
+        </div>
+
+        {/* Members bar */}
+        <div className="border-b border-border px-4 py-3 lg:px-8">
+          <p className="mb-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">
+            Members
+          </p>
+          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+            {members.map((member) => {
+              const avatarUrl = member.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`;
+              return (
+                <button
+                  key={member.id}
+                  onClick={() => handleMemberClick(member)}
+                  className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
+                >
+                  <div className="relative">
+                    <img
+                      src={avatarUrl}
+                      alt={member.name}
+                      className="h-10 w-10 rounded-full bg-secondary border-2 border-transparent group-hover:border-accent/50 transition-all"
+                    />
+                  </div>
+                  <span className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors max-w-[56px] truncate">
+                    {member.name.split(" ")[0]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -116,6 +221,13 @@ const Chat = () => {
             </button>
           </div>
         </div>
+
+        {/* Member profile sheet */}
+        <MemberProfileSheet
+          member={selectedMember}
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+        />
       </div>
     </AppShell>
   );
