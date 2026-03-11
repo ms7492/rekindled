@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send, Users, Sparkles, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { MOCK_CHAT, ChatMessage } from "@/data/mockRooms";
+import { ChatMessage } from "@/data/mockRooms";
 import AppShell from "@/components/AppShell";
 import MemberProfileSheet from "@/components/MemberProfileSheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,10 +15,30 @@ interface RoomMember {
   interests: string[];
 }
 
+/** Generate an event-specific icebreaker message */
+function getEventIcebreaker(eventTitle: string): string {
+  const lower = eventTitle.toLowerCase();
+  if (lower.includes("music") || lower.includes("concert") || lower.includes("dj"))
+    return `Welcome to the "${eventTitle}" room! 🎵 I'm here to help break the ice. What's a song that's been on repeat for you lately? Anyone been to a similar show before?`;
+  if (lower.includes("food") || lower.includes("brunch") || lower.includes("dinner") || lower.includes("taco"))
+    return `Hey foodies! Welcome to "${eventTitle}" 🍽️ What's your go-to comfort food? And does anyone have a favorite spot near the venue?`;
+  if (lower.includes("tech") || lower.includes("hack") || lower.includes("startup") || lower.includes("pitch"))
+    return `Welcome to "${eventTitle}"! 💻 What are you working on right now? Any cool side projects or ideas you're excited about?`;
+  if (lower.includes("fitness") || lower.includes("run") || lower.includes("yoga") || lower.includes("hike"))
+    return `Hey everyone! Welcome to "${eventTitle}" 💪 What's your fitness routine like? Anyone done an event like this before?`;
+  if (lower.includes("comedy") || lower.includes("standup") || lower.includes("improv"))
+    return `Welcome to "${eventTitle}"! 😂 Who's your favorite comedian right now? This is going to be a great time!`;
+  if (lower.includes("art") || lower.includes("gallery") || lower.includes("museum"))
+    return `Hey art lovers! Welcome to "${eventTitle}" 🎨 What kind of art are you into? Anyone been to this gallery before?`;
+  if (lower.includes("game") || lower.includes("gaming") || lower.includes("board"))
+    return `Welcome to "${eventTitle}"! 🎮 What games are you into right now? Let's get to know each other before we meet up!`;
+  return `Welcome to the "${eventTitle}" room! 🔥 I'm Rekindled AI — here to help you all connect before the event. What are you most excited about for this one?`;
+}
+
 const Chat = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<ChatMessage[]>(MOCK_CHAT);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [roomTitle, setRoomTitle] = useState("");
   const [members, setMembers] = useState<RoomMember[]>([]);
@@ -44,7 +64,20 @@ const Chat = () => {
         return;
       }
 
-      setRoomTitle(room.event_title || "Chat Room");
+      const title = room.event_title || "Chat Room";
+      setRoomTitle(title);
+
+      // Generate AI icebreaker based on the event
+      const icebreaker: ChatMessage = {
+        id: "ai-intro",
+        senderId: "ai",
+        senderName: "Rekindled AI",
+        senderAvatar: "",
+        content: getEventIcebreaker(title),
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        isAI: true,
+      };
+      setMessages([icebreaker]);
 
       // Get members with profiles
       const { data: roomMembers } = await supabase

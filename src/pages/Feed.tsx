@@ -148,11 +148,11 @@ const Feed = () => {
         </div>
 
         {/* Card deck area */}
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-4">
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-3 py-3">
           {events.length > 0 ? (
             <>
               {/* Card container */}
-              <div className="relative w-full max-w-[380px] aspect-[3/4.5] sm:aspect-[3/4.2]">
+              <div className="relative w-full max-w-[520px] aspect-[3/5] sm:aspect-[3/4.5]">
                 <AnimatePresence>
                   {events.slice(0, 3).map((event, i) => (
                     <SwipeCard
@@ -167,7 +167,7 @@ const Feed = () => {
               </div>
 
               {/* Action buttons */}
-              <div className="mt-6 flex items-center gap-6">
+              <div className="mt-4 flex items-center gap-6">
                 <button
                   onClick={() => triggerSwipe("left")}
                   className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-red-400/30 bg-card shadow-card transition-all hover:scale-110 hover:border-red-400/60 hover:shadow-elevated active:scale-95"
