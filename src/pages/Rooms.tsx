@@ -26,33 +26,73 @@ const Rooms = () => {
     const fetchUserRooms = async () => {
       setLoading(true);
 
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setLoading(false);
         return;
       }
 
-      // Get events the user swiped right on
-      const { data: swipes } = await supabase
-        .from("swipes")
-        .select("event_id")
-        .eq("user_id", user.id)
-        .eq("direction", "right");
+      // Get rooms user is a member of via room_users
+      const { data: memberships } = await supabase
+        .from("room_users")
+        .select("room_id")
+        .eq("user_id", user.id);
 
-      if (!swipes || swipes.length === 0) {
-        setRooms([]);
+      if (!memberships || memberships.length === 0) {
+        // Fallback: check rooms for events user swiped right on
+        const { data: swipes } = await supabase
+          .from("swipes")
+          .select("event_id")
+          .eq("user_id", user.id)
+          .eq("direction", "right");
+
+        if (!swipes || swipes.length === 0) {
+          setRooms([]);
+          setLoading(false);
+          return;
+        }
+
+        const likedEventIds = swipes.map((s) => s.event_id);
+        const { data: roomData } = await supabase
+          .from("rooms")
+          .select("id, event_id, event_title, created_at")
+          .in("event_id", likedEventIds);
+
+        if (!roomData || roomData.length === 0) {
+          setRooms([]);
+          setLoading(false);
+          return;
+        }
+
+        // Get member counts
+        const roomIds = roomData.map((r) => r.id);
+        const { data: members } = await supabase
+          .from("room_users")
+          .select("room_id")
+          .in("room_id", roomIds);
+
+        const countMap: Record<string, number> = {};
+        for (const m of members || []) {
+          countMap[m.room_id] = (countMap[m.room_id] || 0) + 1;
+        }
+
+        setRooms(
+          roomData.map((r) => ({
+            ...r,
+            member_count: countMap[r.id] || 0,
+          }))
+        );
         setLoading(false);
         return;
       }
 
-      const likedEventIds = swipes.map((s) => s.event_id);
+      const roomIds = memberships.map((m) => m.room_id);
 
-      // Get rooms for those events
+      // Get room details
       const { data: roomData } = await supabase
         .from("rooms")
         .select("id, event_id, event_title, created_at")
-        .in("event_id", likedEventIds);
+        .in("id", roomIds);
 
       if (!roomData || roomData.length === 0) {
         setRooms([]);
@@ -60,15 +100,14 @@ const Rooms = () => {
         return;
       }
 
-      // Get member counts per room
-      const roomIds = roomData.map((r) => r.id);
-      const { data: members } = await supabase
+      // Get member counts for all rooms
+      const { data: allMembers } = await supabase
         .from("room_users")
         .select("room_id")
         .in("room_id", roomIds);
 
       const countMap: Record<string, number> = {};
-      for (const m of members || []) {
+      for (const m of allMembers || []) {
         countMap[m.room_id] = (countMap[m.room_id] || 0) + 1;
       }
 
