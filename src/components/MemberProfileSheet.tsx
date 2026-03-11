@@ -80,7 +80,7 @@ const MemberProfileSheet = ({ member, open, onOpenChange }: MemberProfileSheetPr
                     className="flex items-center gap-1.5 rounded-full border border-border/50 bg-card/50 px-3.5 py-2 text-sm font-medium text-foreground"
                   >
                     <span>{INTEREST_EMOJIS[interest] || "✨"}</span>
-                    {interest}
+                    {INTEREST_LABELS[interest] || interest}
                   </span>
                 ))}
               </div>
