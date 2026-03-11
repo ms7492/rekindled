@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send, Users, Sparkles, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { MOCK_CHAT, ChatMessage } from "@/data/mockRooms";
+import { ChatMessage } from "@/data/mockRooms";
 import AppShell from "@/components/AppShell";
 import MemberProfileSheet from "@/components/MemberProfileSheet";
 import { supabase } from "@/integrations/supabase/client";
