@@ -111,6 +111,9 @@ const Feed = () => {
       toast.success(`You're in for "${event.title}" ✦`);
       setEvents((prev) => prev.filter((e) => e.id !== id));
       setSwipeCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+
+      // Trigger matchmaking so room is created immediately if threshold met
+      supabase.functions.invoke("matchmaking").catch(() => {});
     },
     [events]
   );
