@@ -38,6 +38,7 @@ const CATEGORIES = [
   { value: "art", label: "Art & Culture", emoji: "🎨" },
 ];
 
+const Feed = () => {
   // Read user interests from localStorage and sort events by relevance
   const userInterests: string[] = useMemo(() => {
     try {
