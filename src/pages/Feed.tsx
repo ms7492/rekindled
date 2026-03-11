@@ -1,8 +1,9 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import EventCard from "@/components/EventCard";
 import AppShell from "@/components/AppShell";
 import { MOCK_EVENTS } from "@/data/mockEvents";
+import { supabase } from "@/integrations/supabase/client";
 import { Flame, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
 
 /** Map event tag → interest id for matching */
