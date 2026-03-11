@@ -83,18 +83,47 @@ const Feed = () => {
   const activeCat = CATEGORIES.find((c) => c.value === activeCategory) || CATEGORIES[0];
 
   const handleJoin = useCallback(
-    (id: string) => {
+    async (id: string) => {
       const event = events.find((e) => e.id === id);
-      if (event) {
-        toast.success(`You're in for "${event.title}" ✦`);
-        setEvents((prev) => prev.filter((e) => e.id !== id));
+      if (!event) return;
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in first");
+        return;
       }
+
+      // Insert right swipe
+      const { error } = await supabase
+        .from("swipes")
+        .insert({ user_id: user.id, event_id: id, direction: "right" });
+
+      if (error) {
+        if (error.code === "23505") {
+          toast.info("You already joined this hang!");
+        } else {
+          toast.error("Something went wrong");
+        }
+        return;
+      }
+
+      toast.success(`You're in for "${event.title}" ✦`);
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+      setSwipeCounts((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
     },
     [events]
   );
 
   const handlePass = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("swipes")
+          .insert({ user_id: user.id, event_id: id, direction: "left" })
+          .then(() => {});
+      }
       setEvents((prev) => prev.filter((e) => e.id !== id));
     },
     []
