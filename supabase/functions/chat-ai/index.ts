@@ -1,13 +1,12 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS")
     return new Response(null, { headers: corsHeaders });
 
@@ -84,7 +83,7 @@ Rules:
     const aiContent =
       data.choices?.[0]?.message?.content || "Okay that's a hot take… anyone disagree? 🔥";
 
-    // Insert AI message into the DB
+    // Insert AI message into the DB using service role (bypasses RLS)
     const { error: insertError } = await supabase.from("messages").insert({
       room_id,
       user_id,
