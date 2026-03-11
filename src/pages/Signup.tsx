@@ -202,12 +202,22 @@ const Signup = () => {
 
           {step === "phone-input" && (
             <motion.div key="phone" {...fade} className="w-full space-y-5">
+              {avatarPicker}
+              <div className="space-y-2">
+                <label className="text-[13px] font-medium text-foreground/70">First Name</label>
+                <Input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
+              </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-medium text-foreground/70">Phone Number</label>
                 <Input type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} />
               </div>
-              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handlePhoneContinue}>
-                Continue <ArrowRight className="ml-1.5 h-4 w-4" />
+              <Button
+                className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90"
+                onClick={handlePhoneContinue}
+                disabled={loading}
+              >
+                {loading ? "Please wait..." : "Continue"}
+                <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
               <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
