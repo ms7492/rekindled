@@ -63,13 +63,28 @@ const Signup = () => {
     } finally { setLoading(false); }
   };
 
-  const handlePhoneContinue = () => {
+  const handlePhoneContinue = async () => {
+    if (!name.trim()) { toast.error("Please enter your name"); return; }
     if (phone.trim().length < 7) {
       toast.error("Please enter a valid phone number");
       return;
     }
-    toast.success("Welcome to Rekindled!");
-    navigate("/interests");
+    // Sign up with email derived from phone (workaround since phone auth needs SMS provider)
+    const fakeEmail = `${phone.replace(/\D/g, "")}@phone.rekindled.app`;
+    const tempPassword = `phone_${phone.replace(/\D/g, "")}_${Date.now()}`;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: fakeEmail,
+        password: tempPassword,
+        options: { data: { name, phone } },
+      });
+      if (error) throw error;
+      toast.success("Welcome to Rekindled!");
+      navigate("/interests");
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong");
+    } finally { setLoading(false); }
   };
 
   const subtitle: Record<Step, string> = {
