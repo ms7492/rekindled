@@ -155,7 +155,7 @@ const Signup = () => {
                 </div>
               </button>
               <button
-                onClick={() => setStep("info")}
+                onClick={() => setStep("phone-input")}
                 className="flex w-full items-center gap-4 rounded-2xl border border-border/50 bg-card/50 p-5 text-left transition-all hover:bg-card hover:border-foreground/10 hover:shadow-card"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
