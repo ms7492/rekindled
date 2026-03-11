@@ -186,7 +186,7 @@ const Chat = () => {
     if (!roomId || !currentUserId) return;
 
     // Insert into DB (realtime will add it to the list)
-    const { data: newMsg } = await supabase
+    await supabase
       .from("messages")
       .insert({
         room_id: roomId,
@@ -198,17 +198,18 @@ const Chat = () => {
       .select()
       .single();
 
-    // If someone @mentioned Rekindled AI, generate a response
-    if (text.toLowerCase().includes("@rekindled ai")) {
-      const aiResponse = generateAIResponse(text, roomTitle);
-      await supabase.from("messages").insert({
+    // Get recent messages for AI context
+    const recentMsgs = messages.slice(-10).concat({ id: "temp", user_id: currentUserId, sender_name: currentUserName, content: text, is_ai: false, created_at: new Date().toISOString() });
+
+    // Trigger AI rage-bait response via edge function
+    supabase.functions.invoke("chat-ai", {
+      body: {
         room_id: roomId,
+        event_title: roomTitle,
+        recent_messages: recentMsgs.map(m => ({ sender_name: m.sender_name, content: m.content })),
         user_id: currentUserId,
-        sender_name: "Rekindled AI",
-        content: aiResponse,
-        is_ai: true,
-      });
-    }
+      },
+    }).catch(err => console.error("AI response error:", err));
   };
 
   const mentionOptions = [
