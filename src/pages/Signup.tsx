@@ -224,7 +224,7 @@ const Signup = () => {
               <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleSendOtp}>
                 Send Code <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
-              <button onClick={() => setStep("info")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </button>
             </motion.div>
