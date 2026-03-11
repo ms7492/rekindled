@@ -104,8 +104,7 @@ const Signup = () => {
   const subtitle: Record<Step, string> = {
     method: isLogin ? "Welcome back" : "Let's get you started",
     "email-input": isLogin ? "Sign in to your account" : "Create your account",
-    info: "Tell us about yourself",
-    "phone-input": "Verify your phone number",
+    "phone-input": "Enter your phone number",
     otp: "Enter the code we sent",
   };
 
