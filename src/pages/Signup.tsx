@@ -192,29 +192,11 @@ const Signup = () => {
                 <label className="text-[13px] font-medium text-foreground/70">Phone Number</label>
                 <Input type="tel" placeholder="+1 (555) 000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} />
               </div>
-              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleSendOtp}>
-                Send Code <ArrowRight className="ml-1.5 h-4 w-4" />
+              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handlePhoneContinue}>
+                Continue <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
               <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
-              </button>
-            </motion.div>
-          )}
-
-          {step === "otp" && (
-            <motion.div key="otp" {...fade} className="w-full space-y-5">
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground/70">Verification Code</label>
-                <Input
-                  type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6}
-                  className="h-14 rounded-xl border-border/50 bg-secondary/50 text-foreground text-center text-2xl tracking-[0.4em] placeholder:text-muted-foreground placeholder:tracking-[0.4em] placeholder:text-base focus-visible:ring-1 focus-visible:ring-foreground/30"
-                />
-              </div>
-              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleVerifyOtp}>
-                Verify & Enter <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-              <button onClick={() => setStep("phone-input")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="h-3.5 w-3.5" /> Change number
               </button>
             </motion.div>
           )}
