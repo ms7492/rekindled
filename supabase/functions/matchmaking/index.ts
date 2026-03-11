@@ -11,7 +11,13 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
+    // Parse optional event_titles from request body
+    let eventTitles: Record<string, string> = {};
+    try {
+      const body = await req.json();
+      eventTitles = body?.event_titles || {};
+    } catch { /* no body is fine */ }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -59,10 +65,10 @@ Deno.serve(async (req) => {
       if (sErr) throw sErr;
       if (!swipes || swipes.length < 3) continue;
 
-      // Create room
+      // Create room with title from request body or fallback to event_id
       const { data: room, error: rErr } = await supabase
         .from("rooms")
-        .insert({ event_id: eventId, event_title: eventId })
+        .insert({ event_id: eventId, event_title: eventTitles[eventId] || `Event ${eventId}` })
         .select("id")
         .single();
 
