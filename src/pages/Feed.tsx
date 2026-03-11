@@ -182,7 +182,7 @@ const Feed = () => {
                   {events.map((event, i) => (
                     <EventCard
                       key={event.id}
-                      event={event}
+                      event={{ ...event, attendees: swipeCounts[event.id] || 0 }}
                       onJoin={handleJoin}
                       onPass={handlePass}
                       index={i}
