@@ -7,7 +7,7 @@ import { ArrowRight, ArrowLeft, Camera, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type Step = "method" | "info" | "phone-input" | "otp" | "email-input";
+type Step = "method" | "phone-input" | "otp" | "email-input";
 
 const fade = {
   initial: { opacity: 0, x: 20 },
@@ -63,31 +63,48 @@ const Signup = () => {
     } finally { setLoading(false); }
   };
 
-  const handleInfoContinue = () => {
-    if (!name.trim()) { toast.error("Please enter your name"); return; }
-    if (!email.trim() || !email.includes("@")) { toast.error("Please enter a valid email"); return; }
-    setStep("phone-input");
-  };
-
   const handleSendOtp = async () => {
-    if (phone.length < 10) { toast.error("Please enter a valid phone number"); return; }
-    setStep("otp");
-    toast.success("OTP sent! (mock: use 123456)");
+    const cleaned = phone.replace(/\s/g, "");
+    if (cleaned.length < 10 || !cleaned.startsWith("+")) {
+      toast.error("Enter a valid phone number with country code (e.g. +1...)");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone: cleaned });
+      if (error) throw error;
+      setStep("otp");
+      toast.success("Verification code sent!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send code");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyOtp = async () => {
     if (otp.length < 6) { toast.error("Enter a 6-digit code"); return; }
-    localStorage.setItem("rekindle_name", name);
-    localStorage.setItem("rekindle_email", email);
-    toast.success("Welcome to Rekindled!");
-    navigate("/interests");
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phone.replace(/\s/g, ""),
+        token: otp,
+        type: "sms",
+      });
+      if (error) throw error;
+      toast.success("Welcome to Rekindled!");
+      navigate("/interests");
+    } catch (err: any) {
+      toast.error(err.message || "Invalid code");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const subtitle: Record<Step, string> = {
     method: isLogin ? "Welcome back" : "Let's get you started",
     "email-input": isLogin ? "Sign in to your account" : "Create your account",
-    info: "Tell us about yourself",
-    "phone-input": "Verify your phone number",
+    "phone-input": "Enter your phone number",
     otp: "Enter the code we sent",
   };
 
@@ -138,7 +155,7 @@ const Signup = () => {
                 </div>
               </button>
               <button
-                onClick={() => setStep("info")}
+                onClick={() => setStep("phone-input")}
                 className="flex w-full items-center gap-4 rounded-2xl border border-border/50 bg-card/50 p-5 text-left transition-all hover:bg-card hover:border-foreground/10 hover:shadow-card"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
@@ -197,25 +214,6 @@ const Signup = () => {
             </motion.div>
           )}
 
-          {step === "info" && (
-            <motion.div key="info" {...fade} className="w-full space-y-5">
-              {avatarPicker}
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground/70">Name</label>
-                <Input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground/70">Email</label>
-                <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
-              </div>
-              <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleInfoContinue}>
-                Continue <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-              <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="h-3.5 w-3.5" /> Back
-              </button>
-            </motion.div>
-          )}
 
           {step === "phone-input" && (
             <motion.div key="phone" {...fade} className="w-full space-y-5">
@@ -226,7 +224,7 @@ const Signup = () => {
               <Button className="w-full rounded-full bg-foreground py-6 text-base font-semibold text-primary-foreground hover:opacity-90" onClick={handleSendOtp}>
                 Send Code <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
-              <button onClick={() => setStep("info")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <button onClick={() => setStep("method")} className="flex w-full items-center justify-center gap-1.5 pt-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </button>
             </motion.div>
