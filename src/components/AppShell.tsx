@@ -99,7 +99,8 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav — hidden on chat pages */}
+      {!location.pathname.startsWith("/chat") && (
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/90 backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-md items-center justify-around py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
@@ -122,6 +123,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           })}
         </div>
       </nav>
+      )}
     </div>
   );
 };
