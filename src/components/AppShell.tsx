@@ -123,6 +123,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           })}
         </div>
       </nav>
+      )}
     </div>
   );
 };
